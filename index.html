@@ -135,9 +135,14 @@
     <!-- CHATBOT FLOTANTE -->
     <div id="chatbot-container" class="chatbot-closed">
         <div class="chat-header" onclick="toggleChat()">
-            <span>🤖 Asistente UELB</span>
-            <i class="bi bi-chevron-up" id="chatIcon"></i>
-        </div>
+    <div class="d-flex align-items-center">
+        <!-- Puedes usar tu logo o una imagen de Simón Bolívar si la subes como simon.png -->
+        <!-- Si no tienes imagen, usamos un icono de robot más amigable -->
+        <i class="bi bi-robot me-2 fs-5"></i> 
+        <span>Hola, soy Simón 🇻🇪</span>
+    </div>
+    <i class="bi bi-chevron-up" id="chatIcon"></i>
+</div>
         <div class="chat-body">
             <div class="chat-messages" id="chatMessages">
                 <div class="bot-msg">¡Hola! Soy el asistente virtual. ¿En qué te ayudo?</div>
