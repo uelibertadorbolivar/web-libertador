@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN GENERAL
 // ==========================================
-const API_URL = "PEGAR_AQUI_TU_URL_DE_APPS_SCRIPT"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbx6yo7HVyjq3IDNHSGh_x46CF0_noZa1N9SRJeuPm4Xdk85mzsm-Waef_cWwK1hJ-11/exec"; 
 
 // Variables de Estado
 let noticiasCargadas = false;
