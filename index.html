@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UE Libertador Bolívar</title>
+    <!-- Usamos Bootstrap 5 para diseño rápido y bonito -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --color-primary: #003366; --color-sec: #ffcc00; }
+        body { background-color: #f4f6f9; font-family: sans-serif; }
+        .hero { background: var(--color-primary); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 20px 20px; }
+        .card-result { border-left: 5px solid var(--color-sec); display: none; }
+        .loader { display: none; width: 3rem; height: 3rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Encabezado -->
+    <div class="hero mb-4">
+        <h1>UE Libertador Bolívar</h1>
+        <p>Portal de Gestión Escolar - Autogestión 24/7</p>
+    </div>
+
+    <div class="container">
+        <!-- Módulo de Consulta -->
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-3">Consultar Estatus Estudiantil</h5>
+                        
+                        <div class="input-group mb-3">
+                            <input type="text" id="cedulaInput" class="form-control" placeholder="Cédula escolar o V-..." aria-label="Cédula">
+                            <button class="btn btn-primary" type="button" onclick="consultar()">Buscar</button>
+                        </div>
+
+                        <!-- Spinner de carga -->
+                        <div class="text-center">
+                            <div class="spinner-border text-primary loader" id="loader" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta de Resultado -->
+                        <div class="card mt-3 card-result shadow-sm" id="resultadoCard">
+                            <div class="card-body">
+                                <h4 id="resNombre">Nombre del Alumno</h4>
+                                <p class="mb-1"><strong>Grado:</strong> <span id="resGrado"></span></p>
+                                <p class="mb-0"><strong>Estatus:</strong> <span id="resStatus" class="badge bg-success"></span></p>
+                            </div>
+                        </div>
+                        
+                        <div id="errorMsg" class="alert alert-danger mt-3" style="display:none"></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lógica Javascript -->
+    <script>
+        // PEGA AQUI TU URL DEL PASO 2 (Manten las comillas)
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6yo7HVyjq3IDNHSGh_x46CF0_noZa1N9SRJeuPm4Xdk85mzsm-Waef_cWwK1hJ-11/exec";
+
+        function consultar() {
+            const cedula = document.getElementById('cedulaInput').value.trim();
+            const loader = document.getElementById('loader');
+            const resultCard = document.getElementById('resultadoCard');
+            const errorMsg = document.getElementById('errorMsg');
+
+            if(!cedula) { alert("Por favor escribe una cédula"); return; }
+
+            // Interfaz: Mostrar carga, ocultar resultados previos
+            loader.style.display = 'inline-block';
+            resultCard.style.display = 'none';
+            errorMsg.style.display = 'none';
+
+            // Petición a Google Sheets
+            fetch(`${SCRIPT_URL}?cedula=${cedula}`)
+                .then(response => response.json())
+                .then(data => {
+                    loader.style.display = 'none';
+                    
+                    if (data.length > 0 && !data[0].error) {
+                        // Encontramos al alumno
+                        document.getElementById('resNombre').innerText = data[0].nombre;
+                        document.getElementById('resGrado').innerText = data[0].grado;
+                        document.getElementById('resStatus').innerText = data[0].status;
+                        
+                        // Color del estatus según lo que diga
+                        const statusBadge = document.getElementById('resStatus');
+                        if(data[0].status.toLowerCase().includes('pendiente')) {
+                            statusBadge.className = 'badge bg-warning text-dark';
+                        } else {
+                            statusBadge.className = 'badge bg-success';
+                        }
+
+                        resultCard.style.display = 'block';
+                    } else {
+                        // No encontrado
+                        errorMsg.innerText = "Cédula no encontrada en el sistema.";
+                        errorMsg.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    loader.style.display = 'none';
+                    errorMsg.innerText = "Error de conexión. Intente de nuevo.";
+                    errorMsg.style.display = 'block';
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>
