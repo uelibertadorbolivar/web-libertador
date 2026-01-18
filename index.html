@@ -3,147 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UE Libertador Bolívar</title>
+    <title>UE Libertador Bolívar - Portal Oficial</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root { --primary: #003366; --accent: #ffcc00; }
-        body { background-color: #f8f9fa; }
-        .header { background: var(--primary); color: white; padding: 2rem 1rem; border-bottom: 5px solid var(--accent); }
-        .nav-pills .nav-link.active { background-color: var(--primary); }
-        .nav-pills .nav-link { color: var(--primary); }
-        .guide-card { transition: transform 0.2s; border-left: 4px solid var(--primary); }
-        .guide-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Navbar estilo App */
+        .navbar-custom { background: var(--primary); padding: 1rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .nav-btn { background: rgba(255,255,255,0.1); color: white; border: none; margin: 0 5px; border-radius: 20px; transition: 0.3s; }
+        .nav-btn.active, .nav-btn:hover { background: var(--accent); color: var(--primary); font-weight: bold; }
+        
+        /* Estilos Noticias */
+        .news-card { border: none; border-radius: 15px; overflow: hidden; transition: transform 0.3s; margin-bottom: 20px; }
+        .news-card:hover { transform: translateY(-5px); }
+        .news-img { height: 180px; object-fit: cover; background: #ddd; }
+        
+        /* Estilos Generales */
+        .section-view { display: none; padding: 20px 0; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="header text-center mb-4">
-        <h2>🏫 UE Libertador Bolívar</h2>
-        <p class="mb-0">Sistema de Gestión Escolar Digital</p>
+    <!-- Menú Superior Fijo -->
+    <div class="navbar-custom d-flex justify-content-center overflow-auto text-nowrap">
+        <button class="btn nav-btn active" onclick="nav('inicio')"><i class="bi bi-house"></i> Inicio</button>
+        <button class="btn nav-btn" onclick="nav('noticias'); cargarNoticias()"><i class="bi bi-newspaper"></i> Noticias</button>
+        <button class="btn nav-btn" onclick="nav('guias'); cargarGuias()"><i class="bi bi-journal-bookmark"></i> Guías</button>
+        <button class="btn nav-btn" onclick="nav('inscripcion')"><i class="bi bi-pencil-square"></i> Inscripción</button>
     </div>
 
-    <div class="container">
-        
-        <!-- Menú de Navegación -->
-        <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" onclick="cambiarVista('inicio')">🏠 Inicio / Estatus</button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" onclick="cambiarVista('guias'); cargarGuias()">📚 Biblioteca Digital</button>
-            </li>
-        </ul>
+    <div class="container py-4">
 
-        <!-- VISTA 1: CONSULTA DE ESTATUS -->
-        <div id="vista-inicio">
-            <div class="card shadow-sm mx-auto" style="max-width: 500px;">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Consulta Administrativa</h5>
-                    <div class="input-group mb-3 mt-3">
-                        <input type="text" id="cedulaInput" class="form-control" placeholder="Cédula (V-123...)">
-                        <button class="btn btn-primary" onclick="consultarAlumno()">Buscar</button>
-                    </div>
-                    <div id="resAlumno" class="alert alert-info" style="display:none;"></div>
+        <!-- 1. INICIO / CONSULTA -->
+        <div id="view-inicio" class="section-view" style="display: block;">
+            <div class="text-center mb-5">
+                <h1 style="color: var(--primary)">UE Libertador Bolívar</h1>
+                <p class="lead">Formando el futuro desde 19XX</p>
+            </div>
+            
+            <div class="card shadow p-4 mx-auto" style="max-width: 500px; border-radius: 15px;">
+                <h5 class="mb-3"><i class="bi bi-search"></i> Consulta Administrativa</h5>
+                <div class="input-group">
+                    <input type="text" id="cedulaInput" class="form-control" placeholder="Cédula del estudiante">
+                    <button class="btn btn-primary" onclick="consultarAlumno()">Consultar</button>
                 </div>
+                <div id="resAlumno" class="mt-3"></div>
             </div>
         </div>
 
-        <!-- VISTA 2: BIBLIOTECA DE GUÍAS -->
-        <div id="vista-guias" style="display:none;">
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <select id="filtroAno" class="form-select" onchange="filtrarGuias()">
-                        <option value="Todos">Todos los Años</option>
-                        <option value="1er Año">1er Año</option>
-                        <option value="2do Año">2do Año</option>
-                        <option value="3er Año">3er Año</option>
-                        <option value="4to Año">4to Año</option>
-                        <option value="5to Año">5to Año</option>
-                    </select>
-                </div>
-                <div class="col-md-8 text-end">
-                    <span class="text-muted" id="contadorGuias">Cargando catálogo...</span>
-                </div>
+        <!-- 2. NOTICIAS (BLOG) -->
+        <div id="view-noticias" class="section-view">
+            <h3 class="mb-4 pb-2 border-bottom">📢 Cartelera Informativa</h3>
+            <div id="contenedorNoticias" class="row">
+                <div class="text-center text-muted">Cargando noticias...</div>
             </div>
+        </div>
 
-            <!-- Aquí se inyectarán las guías automáticamente -->
+        <!-- 3. GUÍAS -->
+        <div id="view-guias" class="section-view">
+            <h3 class="mb-3">📚 Biblioteca Digital</h3>
+            <select id="filtroAno" class="form-select mb-4" onchange="filtrarGuias()">
+                <option value="Todos">Ver todos los años</option>
+                <option value="1er Año">1er Año</option>
+                <option value="2do Año">2do Año</option>
+                <option value="3er Año">3er Año</option>
+                <option value="4to Año">4to Año</option>
+                <option value="5to Año">5to Año</option>
+            </select>
             <div id="contenedorGuias" class="row"></div>
         </div>
 
+        <!-- 4. PRE-INSCRIPCIÓN (FORMULARIO) -->
+        <div id="view-inscripcion" class="section-view">
+            <div class="card shadow mx-auto" style="max-width: 600px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Solicitud de Cupo / Inscripción</h5>
+                </div>
+                <div class="card-body">
+                    <form id="formInscripcion" onsubmit="enviarInscripcion(event)">
+                        <div class="mb-3">
+                            <label>Nombre Completo del Estudiante</label>
+                            <input type="text" name="nombre" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Cédula (o Escolar)</label>
+                            <input type="text" name="cedula" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label>Grado a cursar</label>
+                                <select name="grado" class="form-select">
+                                    <option>1er Año</option><option>2do Año</option><option>3er Año</option><option>4to Año</option><option>5to Año</option>
+                                </select>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label>Teléfono Rep.</label>
+                                <input type="tel" name="telefono" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" id="btnEnviar" class="btn btn-warning w-100 fw-bold">ENVIAR SOLICITUD</button>
+                    </form>
+                    <div id="avisoForm" class="mt-3 text-center"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
+    <!-- JAVASCRIPT -->
     <script>
-        // --- CONFIGURACIÓN ---
+        // --- PEGAR TU URL AQUI ---
         const API_URL = "https://script.google.com/macros/s/AKfycbx6yo7HVyjq3IDNHSGh_x46CF0_noZa1N9SRJeuPm4Xdk85mzsm-Waef_cWwK1hJ-11/exec"; 
-        let todasLasGuias = []; // Guardaremos las guías aquí al bajarlas
+        
+        // Variables globales
+        let noticiasCargadas = false;
+        let guiasCache = [];
 
-        // --- FUNCIONES DE NAVEGACIÓN ---
-        function cambiarVista(vista) {
-            document.getElementById('vista-inicio').style.display = (vista === 'inicio') ? 'block' : 'none';
-            document.getElementById('vista-guias').style.display = (vista === 'guias') ? 'block' : 'none';
+        // Navegación
+        function nav(vista) {
+            document.querySelectorAll('.section-view').forEach(el => el.style.display = 'none');
+            document.getElementById('view-' + vista).style.display = 'block';
             
-            // Actualizar botones del menú (Visual)
-            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
         }
 
-        // --- FUNCIONES LÓGICAS ---
-
-        // 1. Consultar Alumno
+        // --- MÓDULO ALUMNO ---
         function consultarAlumno() {
-            const cedula = document.getElementById('cedulaInput').value;
-            const resDiv = document.getElementById('resAlumno');
-            resDiv.style.display = 'block';
-            resDiv.innerHTML = "🔍 Buscando...";
-
-            fetch(`${API_URL}?action=consultar_alumno&cedula=${cedula}`)
-                .then(r => r.json())
-                .then(data => {
-                    if(data.length > 0) {
-                        resDiv.innerHTML = `<strong>${data[0].nombre}</strong><br>Grado: ${data[0].grado}<br>Estatus: <b>${data[0].status}</b>`;
-                        resDiv.className = "alert alert-success";
-                    } else {
-                        resDiv.innerHTML = "❌ Cédula no encontrada";
-                        resDiv.className = "alert alert-danger";
-                    }
-                });
-        }
-
-        // 2. Cargar Guías (Se ejecuta una sola vez al entrar a la pestaña)
-        function cargarGuias() {
-            if(todasLasGuias.length > 0) return; // Si ya cargaron, no recargar
-
-            document.getElementById('contadorGuias').innerText = "Conectando con Drive...";
+            let ced = document.getElementById('cedulaInput').value;
+            let res = document.getElementById('resAlumno');
+            res.innerHTML = '<div class="spinner-border text-primary"></div> Buscando...';
             
-            fetch(`${API_URL}?action=ver_guias`)
+            fetch(`${API_URL}?action=consultar_alumno&cedula=${ced}`)
                 .then(r => r.json())
-                .then(data => {
-                    todasLasGuias = data;
-                    filtrarGuias(); // Mostrar todas inicialmente
+                .then(d => {
+                    if(d.length > 0) res.innerHTML = `<div class="alert alert-success">✅ <b>${d[0].nombre}</b><br>${d[0].grado} - ${d[0].status}</div>`;
+                    else res.innerHTML = `<div class="alert alert-danger">❌ No encontrado</div>`;
                 });
         }
 
-        // 3. Filtrar y Dibujar Guías en pantalla
+        // --- MÓDULO NOTICIAS ---
+        function cargarNoticias() {
+            if(noticiasCargadas) return;
+            fetch(`${API_URL}?action=ver_noticias`)
+                .then(r => r.json())
+                .then(data => {
+                    let html = '';
+                    data.forEach(n => {
+                        // Formatear fecha
+                        let fecha = new Date(n.fecha).toLocaleDateString();
+                        // Imagen por defecto si no hay
+                        let img = n.imagen || 'https://via.placeholder.com/400x200?text=Noticias+UE+LB';
+                        
+                        html += `
+                        <div class="col-md-6">
+                            <div class="card news-card shadow-sm">
+                                <img src="${img}" class="news-img card-img-top" alt="img">
+                                <div class="card-body">
+                                    <small class="text-muted">📅 ${fecha}</small>
+                                    <h5 class="card-title mt-1">${n.titulo}</h5>
+                                    <p class="card-text">${n.contenido}</p>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    document.getElementById('contenedorNoticias').innerHTML = html;
+                    noticiasCargadas = true;
+                });
+        }
+
+        // --- MÓDULO GUÍAS ---
+        function cargarGuias() {
+            if(guiasCache.length > 0) return;
+            fetch(`${API_URL}?action=ver_guias`).then(r => r.json()).then(d => {
+                guiasCache = d;
+                filtrarGuias();
+            });
+        }
         function filtrarGuias() {
-            const filtro = document.getElementById('filtroAno').value;
-            const contenedor = document.getElementById('contenedorGuias');
-            contenedor.innerHTML = ""; // Limpiar
-
-            const guiasFiltradas = todasLasGuias.filter(g => filtro === "Todos" || g.ano === filtro);
-
-            document.getElementById('contadorGuias').innerText = `${guiasFiltradas.length} documentos disponibles`;
-
-            guiasFiltradas.forEach(guia => {
-                const card = `
-                <div class="col-md-6 col-lg-4 mb-3">
-                    <div class="card guide-card h-100 p-3">
-                        <small class="text-muted">${guia.ano} - ${guia.lapso}</small>
-                        <h5 class="mt-1">${guia.materia}</h5>
-                        <p>${guia.titulo}</p>
-                        <a href="${guia.link}" target="_blank" class="btn btn-sm btn-outline-primary">⬇ Descargar PDF</a>
+            let f = document.getElementById('filtroAno').value;
+            let container = document.getElementById('contenedorGuias');
+            container.innerHTML = '';
+            
+            guiasCache.filter(g => f === 'Todos' || g.ano === f).forEach(g => {
+                container.innerHTML += `
+                <div class="col-6 col-md-4 mb-3">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body p-2 text-center">
+                            <small class="d-block text-muted">${g.materia}</small>
+                            <h6 class="text-primary">${g.titulo}</h6>
+                            <a href="${g.link}" target="_blank" class="btn btn-sm btn-outline-dark mt-2">📥 Descargar</a>
+                        </div>
                     </div>
                 </div>`;
-                contenedor.innerHTML += card;
+            });
+        }
+
+        // --- MÓDULO INSCRIPCIÓN (ENVÍO DE DATOS) ---
+        function enviarInscripcion(e) {
+            e.preventDefault();
+            let btn = document.getElementById('btnEnviar');
+            let aviso = document.getElementById('avisoForm');
+            
+            // Recoger datos
+            let formData = new FormData(e.target);
+            let datos = Object.fromEntries(formData.entries());
+
+            btn.disabled = true;
+            btn.innerText = "Enviando...";
+
+            // Enviamos como texto plano para evitar error CORS simple
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(datos)
+            })
+            .then(r => r.json())
+            .then(resp => {
+                if(resp.status === 'success') {
+                    aviso.innerHTML = `<div class="alert alert-success">✅ ¡Datos recibidos! Te contactaremos.</div>`;
+                    e.target.reset();
+                } else {
+                    aviso.innerHTML = `<div class="alert alert-warning">⚠️ Hubo un error, intenta de nuevo.</div>`;
+                }
+                btn.disabled = false;
+                btn.innerText = "ENVIAR SOLICITUD";
             });
         }
     </script>
