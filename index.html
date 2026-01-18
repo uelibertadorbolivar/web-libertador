@@ -4,112 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UE Libertador Bolívar</title>
-    <!-- Usamos Bootstrap 5 para diseño rápido y bonito -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --color-primary: #003366; --color-sec: #ffcc00; }
-        body { background-color: #f4f6f9; font-family: sans-serif; }
-        .hero { background: var(--color-primary); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 20px 20px; }
-        .card-result { border-left: 5px solid var(--color-sec); display: none; }
-        .loader { display: none; width: 3rem; height: 3rem; }
+        :root { --primary: #003366; --accent: #ffcc00; }
+        body { background-color: #f8f9fa; }
+        .header { background: var(--primary); color: white; padding: 2rem 1rem; border-bottom: 5px solid var(--accent); }
+        .nav-pills .nav-link.active { background-color: var(--primary); }
+        .nav-pills .nav-link { color: var(--primary); }
+        .guide-card { transition: transform 0.2s; border-left: 4px solid var(--primary); }
+        .guide-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
-    <!-- Encabezado -->
-    <div class="hero mb-4">
-        <h1>UE Libertador Bolívar</h1>
-        <p>Portal de Gestión Escolar - Autogestión 24/7</p>
+    <div class="header text-center mb-4">
+        <h2>🏫 UE Libertador Bolívar</h2>
+        <p class="mb-0">Sistema de Gestión Escolar Digital</p>
     </div>
 
     <div class="container">
-        <!-- Módulo de Consulta -->
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-center mb-3">Consultar Estatus Estudiantil</h5>
-                        
-                        <div class="input-group mb-3">
-                            <input type="text" id="cedulaInput" class="form-control" placeholder="Cédula escolar o V-..." aria-label="Cédula">
-                            <button class="btn btn-primary" type="button" onclick="consultar()">Buscar</button>
-                        </div>
+        
+        <!-- Menú de Navegación -->
+        <ul class="nav nav-pills nav-fill mb-4" id="pills-tab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" onclick="cambiarVista('inicio')">🏠 Inicio / Estatus</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" onclick="cambiarVista('guias'); cargarGuias()">📚 Biblioteca Digital</button>
+            </li>
+        </ul>
 
-                        <!-- Spinner de carga -->
-                        <div class="text-center">
-                            <div class="spinner-border text-primary loader" id="loader" role="status">
-                                <span class="visually-hidden">Cargando...</span>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de Resultado -->
-                        <div class="card mt-3 card-result shadow-sm" id="resultadoCard">
-                            <div class="card-body">
-                                <h4 id="resNombre">Nombre del Alumno</h4>
-                                <p class="mb-1"><strong>Grado:</strong> <span id="resGrado"></span></p>
-                                <p class="mb-0"><strong>Estatus:</strong> <span id="resStatus" class="badge bg-success"></span></p>
-                            </div>
-                        </div>
-                        
-                        <div id="errorMsg" class="alert alert-danger mt-3" style="display:none"></div>
-
+        <!-- VISTA 1: CONSULTA DE ESTATUS -->
+        <div id="vista-inicio">
+            <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Consulta Administrativa</h5>
+                    <div class="input-group mb-3 mt-3">
+                        <input type="text" id="cedulaInput" class="form-control" placeholder="Cédula (V-123...)">
+                        <button class="btn btn-primary" onclick="consultarAlumno()">Buscar</button>
                     </div>
+                    <div id="resAlumno" class="alert alert-info" style="display:none;"></div>
                 </div>
             </div>
         </div>
+
+        <!-- VISTA 2: BIBLIOTECA DE GUÍAS -->
+        <div id="vista-guias" style="display:none;">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <select id="filtroAno" class="form-select" onchange="filtrarGuias()">
+                        <option value="Todos">Todos los Años</option>
+                        <option value="1er Año">1er Año</option>
+                        <option value="2do Año">2do Año</option>
+                        <option value="3er Año">3er Año</option>
+                        <option value="4to Año">4to Año</option>
+                        <option value="5to Año">5to Año</option>
+                    </select>
+                </div>
+                <div class="col-md-8 text-end">
+                    <span class="text-muted" id="contadorGuias">Cargando catálogo...</span>
+                </div>
+            </div>
+
+            <!-- Aquí se inyectarán las guías automáticamente -->
+            <div id="contenedorGuias" class="row"></div>
+        </div>
+
     </div>
 
-    <!-- Lógica Javascript -->
     <script>
-        // PEGA AQUI TU URL DEL PASO 2 (Manten las comillas)
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx6yo7HVyjq3IDNHSGh_x46CF0_noZa1N9SRJeuPm4Xdk85mzsm-Waef_cWwK1hJ-11/exec";
+        // --- CONFIGURACIÓN ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbx6yo7HVyjq3IDNHSGh_x46CF0_noZa1N9SRJeuPm4Xdk85mzsm-Waef_cWwK1hJ-11/exec"; 
+        let todasLasGuias = []; // Guardaremos las guías aquí al bajarlas
 
-        function consultar() {
-            const cedula = document.getElementById('cedulaInput').value.trim();
-            const loader = document.getElementById('loader');
-            const resultCard = document.getElementById('resultadoCard');
-            const errorMsg = document.getElementById('errorMsg');
+        // --- FUNCIONES DE NAVEGACIÓN ---
+        function cambiarVista(vista) {
+            document.getElementById('vista-inicio').style.display = (vista === 'inicio') ? 'block' : 'none';
+            document.getElementById('vista-guias').style.display = (vista === 'guias') ? 'block' : 'none';
+            
+            // Actualizar botones del menú (Visual)
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
 
-            if(!cedula) { alert("Por favor escribe una cédula"); return; }
+        // --- FUNCIONES LÓGICAS ---
 
-            // Interfaz: Mostrar carga, ocultar resultados previos
-            loader.style.display = 'inline-block';
-            resultCard.style.display = 'none';
-            errorMsg.style.display = 'none';
+        // 1. Consultar Alumno
+        function consultarAlumno() {
+            const cedula = document.getElementById('cedulaInput').value;
+            const resDiv = document.getElementById('resAlumno');
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = "🔍 Buscando...";
 
-            // Petición a Google Sheets
-            fetch(`${SCRIPT_URL}?cedula=${cedula}`)
-                .then(response => response.json())
+            fetch(`${API_URL}?action=consultar_alumno&cedula=${cedula}`)
+                .then(r => r.json())
                 .then(data => {
-                    loader.style.display = 'none';
-                    
-                    if (data.length > 0 && !data[0].error) {
-                        // Encontramos al alumno
-                        document.getElementById('resNombre').innerText = data[0].nombre;
-                        document.getElementById('resGrado').innerText = data[0].grado;
-                        document.getElementById('resStatus').innerText = data[0].status;
-                        
-                        // Color del estatus según lo que diga
-                        const statusBadge = document.getElementById('resStatus');
-                        if(data[0].status.toLowerCase().includes('pendiente')) {
-                            statusBadge.className = 'badge bg-warning text-dark';
-                        } else {
-                            statusBadge.className = 'badge bg-success';
-                        }
-
-                        resultCard.style.display = 'block';
+                    if(data.length > 0) {
+                        resDiv.innerHTML = `<strong>${data[0].nombre}</strong><br>Grado: ${data[0].grado}<br>Estatus: <b>${data[0].status}</b>`;
+                        resDiv.className = "alert alert-success";
                     } else {
-                        // No encontrado
-                        errorMsg.innerText = "Cédula no encontrada en el sistema.";
-                        errorMsg.style.display = 'block';
+                        resDiv.innerHTML = "❌ Cédula no encontrada";
+                        resDiv.className = "alert alert-danger";
                     }
-                })
-                .catch(error => {
-                    loader.style.display = 'none';
-                    errorMsg.innerText = "Error de conexión. Intente de nuevo.";
-                    errorMsg.style.display = 'block';
-                    console.error('Error:', error);
                 });
+        }
+
+        // 2. Cargar Guías (Se ejecuta una sola vez al entrar a la pestaña)
+        function cargarGuias() {
+            if(todasLasGuias.length > 0) return; // Si ya cargaron, no recargar
+
+            document.getElementById('contadorGuias').innerText = "Conectando con Drive...";
+            
+            fetch(`${API_URL}?action=ver_guias`)
+                .then(r => r.json())
+                .then(data => {
+                    todasLasGuias = data;
+                    filtrarGuias(); // Mostrar todas inicialmente
+                });
+        }
+
+        // 3. Filtrar y Dibujar Guías en pantalla
+        function filtrarGuias() {
+            const filtro = document.getElementById('filtroAno').value;
+            const contenedor = document.getElementById('contenedorGuias');
+            contenedor.innerHTML = ""; // Limpiar
+
+            const guiasFiltradas = todasLasGuias.filter(g => filtro === "Todos" || g.ano === filtro);
+
+            document.getElementById('contadorGuias').innerText = `${guiasFiltradas.length} documentos disponibles`;
+
+            guiasFiltradas.forEach(guia => {
+                const card = `
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card guide-card h-100 p-3">
+                        <small class="text-muted">${guia.ano} - ${guia.lapso}</small>
+                        <h5 class="mt-1">${guia.materia}</h5>
+                        <p>${guia.titulo}</p>
+                        <a href="${guia.link}" target="_blank" class="btn btn-sm btn-outline-primary">⬇ Descargar PDF</a>
+                    </div>
+                </div>`;
+                contenedor.innerHTML += card;
+            });
         }
     </script>
 </body>
