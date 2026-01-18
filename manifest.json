@@ -1,0 +1,16 @@
+{
+  "name": "UE Libertador Bolívar",
+  "short_name": "UELB",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#003366",
+  "theme_color": "#003366",
+  "description": "Portal Oficial de Gestión Escolar",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/167/167707.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
