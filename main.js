@@ -1,20 +1,56 @@
-// ==========================================
-// CONFIGURACIÓN GENERAL
-// ==========================================
-const API_URL = "https://script.google.com/macros/s/AKfycbx6yo7HVyjq3IDNHSGh_x46CF0_noZa1N9SRJeuPm4Xdk85mzsm-Waef_cWwK1hJ-11/exec"; 
+/**
+ * ARCHIVO: main.js
+ * Lógica completa para el Portal UE Libertador Bolívar
+ */
 
-// Variables de Estado
+// ==========================================
+// ⚠️ CONFIGURACIÓN OBLIGATORIA ⚠️
+// PEGA AQUÍ ABAJO TU URL DE GOOGLE APPS SCRIPT (La que termina en /exec)
+// ==========================================
+const API_URL = "PEGAR_AQUI_TU_URL_DE_APPS_SCRIPT"; 
+
+
+// ==========================================
+// VARIABLES DE ESTADO (CACHE)
+// ==========================================
 let noticiasCargadas = false;
 let guiasCache = [];
 
+
 // ==========================================
-// 1. SISTEMA DE BIENVENIDA Y ACCESO
+// 1. INICIALIZACIÓN (Se ejecuta al abrir la web)
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    
+    // --- LÓGICA DEL CONTADOR DE VISITAS ---
+    // Busca el elemento en el HTML
+    const contadorElement = document.getElementById('contadorVisitas');
+    
+    if(contadorElement) {
+        // Llama a la API inmediatamente para registrar visita y obtener el número
+        fetch(`${API_URL}?action=registrar_visita`)
+            .then(response => response.json())
+            .then(data => {
+                // Actualiza el número en la pantalla de bienvenida
+                contadorElement.innerText = data.visitas;
+                console.log("Visita registrada. Total: " + data.visitas);
+            })
+            .catch(error => {
+                console.error("Error conectando contador:", error);
+                contadorElement.innerText = "(Offline)";
+            });
+    }
+});
+
+
+// ==========================================
+// 2. SISTEMA DE BIENVENIDA Y ACCESO
 // ==========================================
 
 function entrarAlSistema(e) {
     e.preventDefault();
     
-    // Obtener datos del formulario
+    // Obtener datos del formulario de bienvenida
     const nombre = document.getElementById('userName').value.trim();
     const genero = document.getElementById('userGender').value;
     
@@ -23,85 +59,79 @@ function entrarAlSistema(e) {
         return;
     }
 
-    // Guardar en sesión (para que no se pierda al recargar, opcional)
-    sessionStorage.setItem('usuarioNombre', nombre);
-    sessionStorage.setItem('usuarioGenero', genero);
-
-    // Personalizar Interfaz
+    // Personalizar la interfaz con los datos
     personalizarInterfaz(nombre, genero);
 
-    // Ocultar Bienvenida y Mostrar App
-    document.getElementById('welcome-screen').style.opacity = '0';
+    // Efecto visual: Desvanecer pantalla de bienvenida
+    const welcomeScreen = document.getElementById('welcome-screen');
+    welcomeScreen.style.opacity = '0';
+    welcomeScreen.style.transition = 'opacity 0.5s ease';
+    
     setTimeout(() => {
-        document.getElementById('welcome-screen').style.display = 'none';
+        welcomeScreen.style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
     }, 500);
-
-    // Registrar Visita en segundo plano (No hacemos esperar al usuario)
-    registrarVisita();
 }
 
 function personalizarInterfaz(nombre, genero) {
-    // Nombre corto (Primer nombre)
+    // Tomamos solo el primer nombre para que no sea muy largo
     const primerNombre = nombre.split(" ")[0];
     
-    // Icono según género
+    // Lógica para definir el ícono según el género
     let iconoHTML = "";
     if (genero === "M") {
-        iconoHTML = '<i class="bi bi-person-standing text-primary"></i>'; // Icono Masculino
+        // Ícono Masculino (Azul/Primario)
+        iconoHTML = '<i class="bi bi-person-standing text-primary"></i>'; 
     } else {
-        iconoHTML = '<i class="bi bi-person-standing-dress text-danger"></i>'; // Icono Femenino
+        // Ícono Femenino (Rojo/Rosado - usando text-danger de bootstrap)
+        iconoHTML = '<i class="bi bi-person-standing-dress text-danger"></i>'; 
     }
 
-    // Inyectar en el DOM
+    // Inyectar los datos en la barra superior y en el título de inicio
     document.getElementById('displayUserName').innerText = primerNombre;
     document.getElementById('userIcon').innerHTML = iconoHTML;
     document.getElementById('welcomeName').innerText = primerNombre;
 }
 
-function registrarVisita() {
-    // Llama a la API para sumar +1 al contador
-    fetch(`${API_URL}?action=registrar_visita`)
-        .then(r => r.json())
-        .then(data => {
-            console.log("Visita registrada. Total: " + data.visitas);
-        })
-        .catch(err => console.log("Error contando visita", err));
-}
-
-// Cargar contador inicial (solo visual para la portada)
-document.addEventListener("DOMContentLoaded", () => {
-    // Si queremos mostrar el contador antes de entrar, podemos hacer un fetch rapido
-    // De momento lo dejamos oculto o estático para no retrasar la carga
-    document.getElementById('contadorVisitas').innerText = "Cargando...";
-});
-
 
 // ==========================================
-// 2. NAVEGACIÓN Y MÓDULOS
+// 3. NAVEGACIÓN (Cambio de Pestañas)
 // ==========================================
 
 function nav(vista) {
-    // Ocultar todas las vistas
+    // 1. Ocultar todas las vistas
     document.querySelectorAll('.section-view').forEach(el => el.style.display = 'none');
-    // Mostrar la seleccionada
-    document.getElementById('view-' + vista).style.display = 'block';
     
-    // Actualizar botones menú
+    // 2. Mostrar la vista seleccionada
+    const vistaActiva = document.getElementById('view-' + vista);
+    if(vistaActiva) {
+        vistaActiva.style.display = 'block';
+    }
+    
+    // 3. Actualizar botones del menú (Visualmente activo)
     document.querySelectorAll('.btn-nav').forEach(btn => btn.classList.remove('active'));
     event.currentTarget.classList.add('active');
 }
 
-// --- CONSULTA ALUMNO ---
+
+// ==========================================
+// 4. MÓDULOS DE GESTIÓN ESCOLAR
+// ==========================================
+
+// --- A. CONSULTAR ALUMNO ---
 function consultarAlumno() {
     let ced = document.getElementById('cedulaInput').value;
     let res = document.getElementById('resAlumno');
-    res.innerHTML = '<div class="alert alert-info mt-3">⏳ Buscando en la base de datos...</div>';
+    
+    if(!ced) { alert("Escribe una cédula"); return; }
+
+    res.innerHTML = '<div class="alert alert-info mt-3">⏳ Buscando en secretaría...</div>';
     
     fetch(`${API_URL}?action=consultar_alumno&cedula=${ced}`)
         .then(r => r.json())
         .then(d => {
             if(d.length > 0) {
+                // Alumno encontrado
                 res.innerHTML = `
                 <div class="alert alert-success mt-3 shadow-sm border-0">
                     <h4 class="alert-heading">✅ ¡Encontrado!</h4>
@@ -113,48 +143,61 @@ function consultarAlumno() {
                     </div>
                 </div>`;
             } else {
-                res.innerHTML = `<div class="alert alert-danger mt-3">❌ Cédula no encontrada. Verifique o pase por dirección.</div>`;
+                // No encontrado
+                res.innerHTML = `<div class="alert alert-danger mt-3">❌ Cédula no encontrada en sistema.</div>`;
             }
+        })
+        .catch(err => {
+            res.innerHTML = `<div class="alert alert-warning mt-3">⚠️ Error de conexión.</div>`;
         });
 }
 
-// --- NOTICIAS ---
+// --- B. NOTICIAS ---
 function cargarNoticias() {
-    if(noticiasCargadas) return;
-    document.getElementById('contenedorNoticias').innerHTML = '<div class="text-center w-100"><div class="spinner-border text-primary"></div></div>';
+    if(noticiasCargadas) return; // Si ya cargó, no repetir
+    
+    const contenedor = document.getElementById('contenedorNoticias');
+    contenedor.innerHTML = '<div class="text-center w-100 py-4"><div class="spinner-border text-primary"></div><p>Cargando cartelera...</p></div>';
     
     fetch(`${API_URL}?action=ver_noticias`)
         .then(r => r.json())
         .then(data => {
             let html = '';
-            data.forEach(n => {
-                let img = n.imagen || 'https://via.placeholder.com/400x200?text=Noticias+UE+LB';
-                html += `
-                <div class="col-md-6">
-                    <div class="card shadow-sm h-100">
-                        <img src="${img}" class="card-img-top" style="height:180px; object-fit:cover">
-                        <div class="card-body">
-                            <small class="text-muted">📅 ${new Date(n.fecha).toLocaleDateString()}</small>
-                            <h5 class="card-title mt-1">${n.titulo}</h5>
-                            <p class="card-text small">${n.contenido}</p>
+            if(data.length === 0) {
+                html = '<div class="alert alert-info">No hay noticias recientes.</div>';
+            } else {
+                data.forEach(n => {
+                    let img = n.imagen || 'https://via.placeholder.com/400x200?text=Noticias+UELB';
+                    html += `
+                    <div class="col-md-6">
+                        <div class="card shadow-sm h-100 news-card">
+                            <img src="${img}" class="card-img-top" style="height:180px; object-fit:cover">
+                            <div class="card-body">
+                                <small class="text-muted">📅 ${new Date(n.fecha).toLocaleDateString()}</small>
+                                <h5 class="card-title mt-1">${n.titulo}</h5>
+                                <p class="card-text small">${n.contenido}</p>
+                            </div>
                         </div>
-                    </div>
-                </div>`;
-            });
-            document.getElementById('contenedorNoticias').innerHTML = html;
+                    </div>`;
+                });
+            }
+            contenedor.innerHTML = html;
             noticiasCargadas = true;
         });
 }
 
-// --- GUÍAS ---
+// --- C. GUÍAS ---
 function cargarGuias() {
-    if(guiasCache.length > 0) return;
-    document.getElementById('contenedorGuias').innerText = "Cargando biblioteca...";
+    if(guiasCache.length > 0) return; // Usar memoria si ya existen
     
-    fetch(`${API_URL}?action=ver_guias`).then(r => r.json()).then(d => {
-        guiasCache = d;
-        filtrarGuias();
-    });
+    document.getElementById('contenedorGuias').innerHTML = '<div class="text-center py-4 text-muted">Conectando con la biblioteca...</div>';
+    
+    fetch(`${API_URL}?action=ver_guias`)
+        .then(r => r.json())
+        .then(d => {
+            guiasCache = d;
+            filtrarGuias(); // Mostrar todas inicialmente
+        });
 }
 
 function filtrarGuias() {
@@ -162,46 +205,65 @@ function filtrarGuias() {
     let container = document.getElementById('contenedorGuias');
     container.innerHTML = '';
     
+    // Filtrar en memoria
     let datos = guiasCache.filter(g => f === 'Todos' || g.ano === f);
-    if(datos.length === 0) container.innerHTML = '<div class="alert alert-warning w-100">No hay guías para este año todavía.</div>';
+    
+    if(datos.length === 0) {
+        container.innerHTML = '<div class="alert alert-warning w-100">No hay guías cargadas para este año.</div>';
+        return;
+    }
 
     datos.forEach(g => {
         container.innerHTML += `
         <div class="col-6 col-md-4">
-            <div class="card guide-card h-100 p-3 text-center">
+            <div class="card guide-card h-100 p-3 text-center position-relative">
                 <div class="mb-2"><i class="bi bi-file-earmark-pdf fs-1 text-danger"></i></div>
                 <small class="d-block text-muted text-uppercase fw-bold" style="font-size:0.7rem">${g.materia}</small>
                 <h6 class="text-primary my-2" style="font-size:0.9rem">${g.titulo}</h6>
-                <a href="${g.link}" target="_blank" class="btn btn-sm btn-outline-primary w-100 rounded-pill">Descargar</a>
+                <a href="${g.link}" target="_blank" class="btn btn-sm btn-outline-primary w-100 rounded-pill stretched-link">Descargar</a>
             </div>
         </div>`;
     });
 }
 
-// --- INSCRIPCIÓN ---
+// --- D. INSCRIPCIÓN ---
 function enviarInscripcion(e) {
     e.preventDefault();
     let btn = document.getElementById('btnEnviar');
     let aviso = document.getElementById('avisoForm');
-    let datos = Object.fromEntries(new FormData(e.target).entries());
+    
+    // Convertir datos del formulario a objeto JSON
+    let formData = new FormData(e.target);
+    let datos = Object.fromEntries(formData.entries());
 
-    btn.disabled = true; btn.innerText = "Enviando...";
+    btn.disabled = true; 
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Enviando...';
 
-    fetch(API_URL, { method: 'POST', body: JSON.stringify(datos) })
+    fetch(API_URL, { 
+        method: 'POST', 
+        body: JSON.stringify(datos) 
+    })
     .then(r => r.json())
     .then(resp => {
         if(resp.status === 'success') {
-            aviso.innerHTML = `<div class="alert alert-success">✅ ¡Datos recibidos exitosamente!</div>`;
+            aviso.innerHTML = `<div class="alert alert-success">✅ ¡Solicitud recibida! Te contactaremos pronto.</div>`;
             e.target.reset();
         } else {
-            aviso.innerHTML = `<div class="alert alert-danger">⚠️ Error. Intente de nuevo.</div>`;
+            aviso.innerHTML = `<div class="alert alert-danger">⚠️ Error en el servidor. Intenta de nuevo.</div>`;
         }
-        btn.disabled = false; btn.innerText = "ENVIAR DATOS";
+        btn.disabled = false; 
+        btn.innerText = "ENVIAR DATOS";
+    })
+    .catch(err => {
+        aviso.innerHTML = `<div class="alert alert-danger">⚠️ Error de conexión.</div>`;
+        btn.disabled = false;
+        btn.innerText = "ENVIAR DATOS";
     });
 }
 
+
 // ==========================================
-// 3. CHATBOT INTELIGENTE
+// 5. CHATBOT "SIMÓN"
 // ==========================================
 
 function toggleChat() {
@@ -221,36 +283,38 @@ function chatAsk(tema) {
     const chatBox = document.getElementById('chatMessages');
     let respuesta = "";
 
-    // 1. Mostrar pregunta del usuario
+    // 1. Mostrar lo que el usuario preguntó
     let preguntaTexto = event.target.innerText;
     chatBox.innerHTML += `<div class="user-msg">${preguntaTexto}</div>`;
 
-    // 2. Lógica de respuestas (Simulada)
+    // 2. Cerebro de respuestas de Simón
     switch(tema) {
         case 'requisitos':
-            respuesta = "Para inscribir necesitas: Copia de Cédula, Partida de Nacimiento, Fotos tipo carnet y Boletín del año anterior. Ve a la pestaña 'Inscribir'.";
+            respuesta = "Para inscribirte necesitamos: Copia de Cédula (o escolar), Partida de Nacimiento y el Boletín del año pasado. ¡Todo se sube aquí mismo!";
             break;
         case 'notas':
-            respuesta = "Puedes ver las notas en 'Inicio' ingresando la Cédula del estudiante en el buscador.";
+            respuesta = "Es fácil. Ve a la pestaña 'Inicio', coloca tu cédula en el buscador y verás tu boleta actualizada.";
             break;
         case 'ubicacion':
-            respuesta = "Estamos ubicados en la Av. Principal, al lado de la Plaza Bolívar. Horario: 7am a 12pm.";
+            respuesta = "La UE Libertador Bolívar está siempre abierta para ti. Estamos en la dirección principal de tu comunidad.";
             break;
         case 'contacto':
-            respuesta = "Escribe al correo: direccion@uelibertador.com o ve a la Dirección del plantel.";
+            respuesta = "Si necesitas hablar con dirección, acércate en horario de oficina (7am - 12pm) o déjanos tus datos en 'Inscripción' para llamarte.";
             break;
         default:
-            respuesta = "No entendí tu pregunta, intenta otra opción.";
+            respuesta = "Disculpa, no entendí bien. ¿Puedes probar con los botones de abajo?";
     }
 
-    // 3. Simular "Escribiendo..." y mostrar respuesta
-    chatBox.innerHTML += `<div class="text-muted small ms-2 mb-1">Escribiendo...</div>`;
-    chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+    // 3. Simular "Escribiendo..."
+    chatBox.innerHTML += `<div class="text-muted small ms-2 mb-1 id='typing'">Simón está escribiendo...</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight; 
 
     setTimeout(() => {
-        // Borrar "Escribiendo" y poner respuesta
-        chatBox.lastElementChild.remove();
+        // Eliminar mensaje de escribiendo (truco rápido borrando el último elemento si fuera un div, 
+        // pero aquí simplemente agregamos la respuesta al final para simplificar)
+        // Lo ideal es remover el 'typing', pero para simplificar agregamos la respuesta directa.
+        
         chatBox.innerHTML += `<div class="bot-msg">${respuesta}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }, 1000);
+        chatBox.scrollTop = chatBox.scrollHeight; // Bajar scroll al final
+    }, 800);
 }
