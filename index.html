@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Educativo - UE Libertador Bolívar</title>
+    <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <!-- CARGADOR -->
+    <div id="main-loader" class="loader-overlay" style="display:none;">
+        <div class="loader-box">
+            <div class="loader-ring"></div>
+            <img src="assets/img/logo.png" class="loader-img">
+        </div>
+    </div>
+
+    <!-- PANTALLA DE ACCESO (FACHADA EDUCATIVA) -->
+    <div id="login-screen" class="login-wrapper">
+        <div class="login-grid">
+            <!-- Lado Izquierdo: Mensaje de Bienvenida -->
+            <div class="login-info d-none d-lg-flex">
+                <div class="animate__animated animate__fadeInLeft">
+                    <img src="assets/img/logo.png" width="120" class="mb-4 shadow-lg rounded-circle bg-white p-2">
+                    <h1 class="display-4 fw-bold">Sistema Integral de Gestión</h1>
+                    <p class="lead opacity-75">UE Libertador Bolívar: Formando el futuro de la nación con excelencia y tecnología.</p>
+                    <div class="mt-5 d-flex gap-3">
+                        <div class="info-badge"><i class="bi bi-shield-check"></i> Seguro</div>
+                        <div class="info-badge"><i class="bi bi-lightning-charge"></i> Dinámico</div>
+                        <div class="info-badge"><i class="bi bi-book"></i> Educativo</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lado Derecho: Formulario -->
+            <div class="login-form-container">
+                <div class="card login-card animate__animated animate__zoomIn">
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <img src="assets/img/logo.png" width="80" class="d-lg-none mb-3">
+                        <h3 class="fw-bold mb-1 text-dark">¡Bienvenido!</h3>
+                        <p class="text-muted small mb-4">Ingrese sus credenciales para acceder al portal</p>
+
+                        <div id="login-steps">
+                            <div id="step-cedula">
+                                <div class="form-floating mb-3">
+                                    <input type="number" id="inputCedula" class="form-control" placeholder="Cédula">
+                                    <label>Cédula de Identidad</label>
+                                </div>
+                                <button onclick="App.verificarUsuario()" id="btn-check" class="btn btn-primary w-100 py-3 shadow-lg">Continuar <i class="bi bi-arrow-right ms-2"></i></button>
+                                <div class="my-3 small text-muted">O también</div>
+                                <button onclick="App.modalInvitado()" class="btn btn-outline-secondary btn-sm w-100 py-2">Acceso Invitado</button>
+                            </div>
+
+                            <div id="step-login" style="display:none;">
+                                <div class="user-pill mb-3"><i class="bi bi-person-circle me-2"></i><span id="lbl-nombre-login"></span></div>
+                                <div class="form-floating mb-3">
+                                    <input type="password" id="inputPass" class="form-control" placeholder="Clave">
+                                    <label>Contraseña</label>
+                                </div>
+                                <button onclick="App.login()" id="btn-login" class="btn btn-success w-100 py-3 shadow">Entrar al Sistema</button>
+                                <button onclick="App.showForgot()" class="btn btn-link btn-sm mt-2 text-decoration-none text-muted">¿Olvidó su clave?</button>
+                            </div>
+
+                            <div id="step-register" style="display:none;">
+                                <div class="alert alert-primary py-2 small mb-3">Primer ingreso: Configure su seguridad</div>
+                                <input type="password" id="regPass" class="form-control mb-2 py-3" placeholder="Nueva Contraseña">
+                                <select id="regPregunta" class="form-select mb-2 py-3 small shadow-none">
+                                    <option value="">Pregunta Secreta</option>
+                                    <option>¿Nombre de su mascota?</option>
+                                    <option>¿Ciudad de nacimiento?</option>
+                                </select>
+                                <input type="text" id="regRespuesta" class="form-control mb-3 py-3" placeholder="Respuesta">
+                                <button onclick="App.registrarClave()" id="btn-reg" class="btn btn-warning w-100 py-3 text-white">Activar Cuenta</button>
+                            </div>
+
+                            <div id="step-forgot" style="display:none;">
+                                <p class="small text-primary mb-2" id="lbl-pregunta"></p>
+                                <input type="text" id="recRespuesta" class="form-control mb-2 py-3" placeholder="Su respuesta">
+                                <input type="password" id="recNewPass" class="form-control mb-3 py-3" placeholder="Nueva Clave">
+                                <button onclick="App.recuperarClave()" id="btn-rec" class="btn btn-danger w-100 py-3">Restablecer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ESTRUCTURA APP -->
+    <div id="app-wrapper" style="display: none;">
+        <aside id="sidebar" class="sidebar-main">
+            <div class="sidebar-header" onclick="App.showDashboard()" style="cursor: pointer;">
+                <img src="assets/img/logo.png" width="40">
+                <div class="ms-3 text-dark">
+                    <div class="fw-bold small">UE Libertador Bolívar</div>
+                    <div style="font-size: 0.6rem; color: #718096;">Administración</div>
+                </div>
+            </div>
+            <div id="sidebar-menu" class="accordion accordion-flush mt-2"></div>
+        </aside>
+
+        <main id="main-content">
+            <header class="navbar sticky-top bg-white border-bottom px-4 py-2">
+                <button class="btn btn-light d-lg-none me-3" onclick="App.toggleSidebar()"><i class="bi bi-list fs-4"></i></button>
+                <h6 class="mb-0 fw-bold text-secondary text-truncate" id="page-title">Panel de Control</h6>
+                <div class="ms-auto d-flex align-items-center">
+                    <span class="small fw-medium me-3 text-muted d-none d-md-inline" id="user-display-name"></span>
+                    <div class="avatar-circle" onclick="App.logout()" style="cursor:pointer">U</div>
+                </div>
+            </header>
+            <div id="dashboard-view"></div>
+            <div id="dynamic-view" style="display:none;"></div>
+        </main>
+    </div>
+
+    <!-- SIMÓN CHATBOT (CORREGIDO) -->
+    <div id="simon-container">
+        <button onclick="Simon.toggle()" class="simon-trigger-btn animate__animated animate__bounceInRight">
+            <img src="assets/img/simon.png" class="simon-avatar-small">
+            <span class="simon-badge">¿Ayuda?</span>
+        </button>
+        <div id="simon-chat" class="simon-window shadow-lg animate__animated" style="display:none;">
+            <div class="simon-header">
+                <img src="assets/img/simon.png" width="30" class="rounded-circle bg-white">
+                <span class="ms-2 fw-bold text-white small">Simón</span>
+                <button class="ms-auto btn btn-link text-white p-0" onclick="Simon.toggle()"><i class="bi bi-dash-lg"></i></button>
+            </div>
+            <div id="simon-messages" class="simon-body"></div>
+            <div class="simon-footer">
+                <input type="text" id="simon-input" placeholder="Pregúntame algo..." onkeypress="Simon.handleKey(event)">
+                <button onclick="Simon.send()"><i class="bi bi-send-fill"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
