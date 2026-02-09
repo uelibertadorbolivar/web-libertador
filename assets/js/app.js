@@ -1,5 +1,6 @@
 /**
  * SIGAE - CORE UE LIBERTADOR BOLÍVAR
+ * Versión Final: Mensajes de éxito y permanencia en vista
  */
 
 const systemStructure = [
@@ -80,7 +81,6 @@ const App = {
         });
     },
 
-    // --- CORRECCIÓN DE VALIDACIÓN ---
     verificarUsuario: function() {
         const ced = document.getElementById('inputCedula').value;
         if(!ced) return;
@@ -93,25 +93,8 @@ const App = {
                 if(res.hasPassword) {
                     document.getElementById('lbl-nombre-login').innerText = res.nombre;
                     document.getElementById('step-login').style.display = 'block';
-                    Simon.say("¡Hola de nuevo! Por favor ingresa tu contraseña.");
-                } else {
-                    document.getElementById('step-register').style.display = 'block';
-                    Simon.say("Veo que es tu primer acceso al sistema. Por favor define tu contraseña y seguridad.");
-                }
-            } else { Swal.fire('Acceso Denegado', 'Cédula no autorizada en el sistema.', 'error'); }
-        });
-    },
-
-    registrarClave: function() {
-        const pass = document.getElementById('regPass').value;
-        const preg = document.getElementById('regPregunta').value;
-        const resp = document.getElementById('regRespuesta').value;
-        if(!pass || !preg || !resp) return Swal.fire("Atención", "Complete todos los campos de seguridad", "warning");
-
-        this.showLoader();
-        App.sendRequest({ action: "registrar_clave", cedula: this.tempCedula, password: pass, pregunta: preg, respuesta: resp }, (res) => {
-            this.hideLoader();
-            Swal.fire('¡Éxito!', 'Seguridad configurada. Ya puede ingresar.', 'success').then(() => location.reload());
+                } else { document.getElementById('step-register').style.display = 'block'; }
+            } else { Swal.fire('Error', 'Cédula no autorizada', 'error'); }
         });
     },
 
@@ -123,36 +106,8 @@ const App = {
                 this.user = res.user;
                 localStorage.setItem('schoolUser', JSON.stringify(this.user));
                 this.loadAppData();
-            } else { this.hideLoader(); Swal.fire('Error', 'Contraseña incorrecta', 'error'); }
+            } else { this.hideLoader(); Swal.fire('Error', 'Clave incorrecta', 'error'); }
         });
-    },
-
-    showForgot: function() {
-        App.sendRequest({ action: "get_pregunta", cedula: this.tempCedula }, (res) => {
-            document.getElementById('lbl-pregunta').innerText = res.pregunta;
-            document.getElementById('step-login').style.display = 'none';
-            document.getElementById('step-forgot').style.display = 'block';
-        });
-    },
-
-    recuperarClave: function() {
-        const data = { action: "recuperar_clave", cedula: this.tempCedula, respuesta: document.getElementById('recRespuesta').value, newPassword: document.getElementById('recNewPass').value };
-        this.showLoader();
-        App.sendRequest(data, (res) => {
-            this.hideLoader();
-            if(res.status === "success") { Swal.fire('Listo', 'Nueva clave establecida', 'success').then(() => location.reload()); }
-            else { Swal.fire('Error', res.message, 'error'); }
-        });
-    },
-
-    modalInvitado: async function() {
-        const { value: nombre } = await Swal.fire({ title: 'Acceso de Invitado', input: 'text', inputLabel: '¿Cuál es su nombre?', confirmButtonText: 'Ingresar', confirmButtonColor: '#1e2b5e' });
-        if (nombre) {
-            this.user = { name: nombre, role: "Visitante" };
-            this.allRoles["Visitante"] = ["Solicitud de Cupos", "Accesibilidad y Apariencia"];
-            localStorage.setItem('schoolUser', JSON.stringify(this.user));
-            this.loadAppData();
-        }
     },
 
     showApp: function() {
@@ -193,7 +148,7 @@ const App = {
         document.getElementById('dynamic-view').style.display = 'none';
         const dash = document.getElementById('dashboard-view');
         dash.style.display = 'block';
-        document.getElementById('page-title').innerText = "Portal Educativo - Inicio";
+        document.getElementById('page-title').innerText = "Panel de Control";
         const res = this.schoolData || { nombre: "UE Libertador Bolívar", direccion: "Sede Principal" };
         dash.innerHTML = `
             <div class="p-4 animate__animated animate__fadeIn">
@@ -201,7 +156,7 @@ const App = {
                     <div class="col-12">
                         <div class="card p-5 text-white shadow-lg border-0" style="background: linear-gradient(135deg, #1e2b5e 0%, #2a3b7a 100%); border-radius: 30px;">
                             <h2 class="fw-bold mb-1">${res.nombre}</h2>
-                            <p class="opacity-75 mb-0 small"><i class="bi bi-geo-alt-fill me-1"></i> ${res.direccion}</p>
+                            <p class="opacity-75 mb-0"><i class="bi bi-geo-alt-fill me-1"></i> ${res.direccion}</p>
                         </div>
                     </div>
                     <div class="col-md-4"><div class="card p-4 h-100 border-0 shadow-sm rounded-4"><h6 class="fw-bold text-primary">Misión</h6><p class="small text-muted">${res.mision || 'No definida'}</p></div></div>
@@ -221,28 +176,32 @@ const App = {
         const div = document.getElementById('dynamic-view');
         div.style.display = 'block';
         document.getElementById('page-title').innerText = title;
-        div.innerHTML = `<div class="p-5 text-center text-muted"><i class="bi bi-gear-wide-connected fs-1 d-block mb-3 opacity-25"></i> Módulo <b>${title}</b> bajo construcción.</div>`;
+        div.innerHTML = `<div class="p-5 text-center text-muted"><i class="bi bi-gear-wide-connected fs-1 d-block mb-3 opacity-25"></i> Módulo <b>${title}</b> en desarrollo.</div>`;
     },
 
-    sendRequest: function(data, callback) { fetch(AppConfig.getApiUrl(), { method: "POST", body: JSON.stringify(data) }).then(r => r.json()).then(res => callback(res)).catch(e => { this.hideLoader(); console.error(e); }); },
+    sendRequest: function(data, callback) {
+        fetch(AppConfig.getApiUrl(), { method: "POST", body: JSON.stringify(data) })
+        .then(r => r.json()).then(res => callback(res)).catch(e => { this.hideLoader(); console.error(e); });
+    },
+
     logout: function() { localStorage.removeItem('schoolUser'); location.reload(); }
 };
 
-/** MÓDULO GESTIÓN DE USUARIOS **/
+/** MÓDULO GESTIÓN DE USUARIOS (CORREGIDO) **/
 const ModuloUsuarios = {
-    render: async function() {
+    render: function() {
         document.getElementById('dashboard-view').style.display = 'none';
         const div = document.getElementById('dynamic-view');
         div.style.display = 'block';
         div.innerHTML = `
             <div class="p-4 animate__animated animate__fadeIn">
-                <div class="card p-4 border-0 shadow-sm rounded-4 mb-4">
-                    <h6 class="fw-bold mb-3">Registrar Personal</h6>
+                <div class="card p-4 border-0 shadow-sm rounded-4 mb-4 bg-white">
+                    <h6 class="fw-bold mb-3 text-primary">Registrar Personal</h6>
                     <div class="row g-3">
-                        <div class="col-md-3"><input type="number" id="u-ced" class="form-control rounded-pill" placeholder="Cédula"></div>
-                        <div class="col-md-4"><input type="text" id="u-nom" class="form-control rounded-pill" placeholder="Nombre Completo"></div>
+                        <div class="col-md-3"><input type="number" id="u-ced" class="form-control rounded-pill px-4" placeholder="Cédula"></div>
+                        <div class="col-md-4"><input type="text" id="u-nom" class="form-control rounded-pill px-4" placeholder="Nombre Completo"></div>
                         <div class="col-md-3">
-                            <select id="u-rol" class="form-select rounded-pill">
+                            <select id="u-rol" class="form-select rounded-pill px-4 shadow-none">
                                 <option value="">Seleccione Rol</option>
                                 <option value="Administrador">Administrador</option>
                                 <option value="Director">Director</option>
@@ -252,12 +211,11 @@ const ModuloUsuarios = {
                         <div class="col-md-2"><button onclick="ModuloUsuarios.save()" class="btn btn-primary w-100 rounded-pill">Guardar</button></div>
                     </div>
                 </div>
-                <div class="card p-4 border-0 shadow-sm rounded-4">
-                    <div class="d-flex justify-content-between mb-3">
-                        <input type="text" id="u-busq" class="form-control w-50 rounded-pill" placeholder="Buscar..." onkeyup="ModuloUsuarios.filter()">
-                        <select id="u-filt-rol" class="form-select w-25 rounded-pill" onchange="ModuloUsuarios.filter()">
+                <div class="card p-4 border-0 shadow-sm rounded-4 bg-white">
+                    <div class="d-flex justify-content-between mb-3 gap-2">
+                        <input type="text" id="u-busq" class="form-control w-50 rounded-pill px-4 shadow-none" placeholder="Buscar..." onkeyup="ModuloUsuarios.filter()">
+                        <select id="u-filt-rol" class="form-select w-25 rounded-pill px-4 shadow-none" onchange="ModuloUsuarios.filter()">
                             <option value="">Todos los Roles</option>
-                            <option value="Administrador">Administrador</option>
                             ${Object.keys(App.allRoles).map(r => `<option value="${r}">${r}</option>`).join('')}
                         </select>
                     </div>
@@ -266,13 +224,109 @@ const ModuloUsuarios = {
             </div>`;
         this.load();
     },
-    load: function() { App.showLoader(); App.sendRequest({ action: "get_users" }, (res) => { App.allUsers = res.users; this.draw(App.allUsers); App.hideLoader(); }); },
-    draw: function(data) { const t = document.getElementById('u-tabla'); t.innerHTML = data.map(u => `<tr><td>${new Date(u.fecha).toLocaleDateString()}</td><td>${u.cedula}</td><td>${u.nombre}</td><td>${u.rol}</td><td><button class="btn btn-sm btn-light text-danger" onclick="ModuloUsuarios.delete(${u.cedula})"><i class="bi bi-trash"></i></button></td></tr>`).join(''); },
-    filter: function() { const val = document.getElementById('u-busq').value.toLowerCase(); const rol = document.getElementById('u-filt-rol').value; const filtered = App.allUsers.filter(u => (u.nombre.toLowerCase().includes(val) || String(u.cedula).includes(val)) && (rol === "" || u.rol === rol)); this.draw(filtered); },
-    save: function() { const user = { cedula: document.getElementById('u-ced').value, nombre: document.getElementById('u-nom').value, rol: document.getElementById('u-rol').value }; if(!user.cedula || !user.nombre || !user.rol) return Swal.fire("Error", "Complete los campos", "warning"); App.showLoader(); App.sendRequest({ action: "save_user", user: user }, () => { this.render(); Swal.fire("Listo", "Usuario guardado", "success"); }); },
-    delete: function(ced) { Swal.fire({ title: '¿Eliminar?', icon: 'warning', showCancelButton: true }).then(r => { if(r.isConfirmed) { App.showLoader(); App.sendRequest({ action: "delete_user", cedula: ced }, () => this.render()); } }); }
+    load: function() {
+        App.showLoader();
+        App.sendRequest({ action: "get_users" }, (res) => {
+            App.allUsers = res.users;
+            this.draw(App.allUsers);
+            App.hideLoader();
+        });
+    },
+    draw: function(data) {
+        const t = document.getElementById('u-tabla');
+        t.innerHTML = data.map(u => `<tr><td>${new Date(u.fecha).toLocaleDateString()}</td><td class="fw-bold">${u.cedula}</td><td>${u.nombre}</td><td><span class="badge bg-light text-dark border-0 shadow-sm">${u.rol}</span></td><td><button class="btn btn-sm btn-light text-danger rounded-circle" onclick="ModuloUsuarios.delete(${u.cedula})"><i class="bi bi-trash"></i></button></td></tr>`).join('');
+    },
+    filter: function() {
+        const val = document.getElementById('u-busq').value.toLowerCase();
+        const rol = document.getElementById('u-filt-rol').value;
+        const filtered = App.allUsers.filter(u => (u.nombre.toLowerCase().includes(val) || String(u.cedula).includes(val)) && (rol === "" || u.rol === rol));
+        this.draw(filtered);
+    },
+    save: function() {
+        const user = { cedula: document.getElementById('u-ced').value, nombre: document.getElementById('u-nom').value, rol: document.getElementById('u-rol').value };
+        if(!user.cedula || !user.nombre || !user.rol) return Swal.fire("Error", "Complete los campos", "warning");
+        App.showLoader();
+        App.sendRequest({ action: "save_user", user: user }, () => {
+            Swal.fire("Éxito", "Usuario guardado correctamente", "success");
+            this.render(); // Refresca la vista de usuarios sin ir al inicio
+        });
+    },
+    delete: function(ced) {
+        Swal.fire({ title: '¿Eliminar usuario?', icon: 'warning', showCancelButton: true }).then(r => {
+            if(r.isConfirmed) { 
+                App.showLoader(); 
+                App.sendRequest({ action: "delete_user", cedula: ced }, () => {
+                    Swal.fire("Eliminado", "El usuario ha sido removido", "success");
+                    this.render();
+                }); 
+            }
+        });
+    }
 };
 
+/** MÓDULO ROLES (CORREGIDO - PERMANECE EN VISTA) **/
+const ModuloSoftware = {
+    renderRoles: function() {
+        document.getElementById('dashboard-view').style.display = 'none';
+        const div = document.getElementById('dynamic-view');
+        div.style.display = 'block';
+        let rolesHtml = "";
+        for (let r in App.allRoles) {
+            rolesHtml += `<div class="col-md-4 mb-3"><div class="card p-3 border-0 shadow-sm d-flex flex-row justify-content-between align-items-center rounded-4 bg-white"><div><h6 class="fw-bold mb-0">${r}</h6><small class="text-muted">${App.allRoles[r].length} permisos</small></div><div class="d-flex gap-2"><button onclick="ModuloSoftware.editRole('${r}')" class="btn btn-sm btn-light rounded-circle text-primary shadow-sm"><i class="bi bi-pencil"></i></button><button onclick="ModuloSoftware.deleteRole('${r}')" class="btn btn-sm btn-light rounded-circle text-danger shadow-sm"><i class="bi bi-trash"></i></button></div></div></div>`;
+        }
+        div.innerHTML = `<div class="p-4 animate__animated animate__fadeIn"><div class="d-flex justify-content-between align-items-center mb-4"><h5 class="fw-bold mb-0 text-primary">Gestión de Roles</h5><button onclick="ModuloSoftware.formRole()" class="btn btn-primary px-4 rounded-pill shadow-sm">Nuevo Rol</button></div><div class="row">${rolesHtml}</div></div>`;
+    },
+    formRole: function(rolName = "", currentPerms = []) {
+        let optionsHtml = "";
+        systemStructure.forEach(cat => {
+            optionsHtml += `<div class="col-12 mt-3 mb-2"><span class="badge bg-light text-dark border-0 shadow-sm p-2 px-3 rounded-pill">${cat.category}</span></div>`;
+            cat.items.forEach(item => { optionsHtml += `<div class="col-md-6 mb-1"><div class="form-check"><input class="form-check-input role-check" type="checkbox" value="${item}" id="chk-${item}" ${currentPerms.includes(item) ? 'checked' : ''}><label class="form-check-label small" for="chk-${item}">${item}</label></div></div>`; });
+        });
+        Swal.fire({
+            title: 'Configurar Privilegios', width: '850px',
+            html: `<input type="text" id="role-name" class="form-control mb-4 rounded-pill px-4 shadow-none" placeholder="Nombre Rol" value="${rolName}" ${rolName ? 'disabled' : ''}><div class="row text-start" style="max-height: 400px; overflow-y: auto;">${optionsHtml}</div>`,
+            showCancelButton: true, confirmButtonText: 'Guardar Privilegios', confirmButtonColor: '#1e2b5e',
+            preConfirm: () => {
+                const name = document.getElementById('role-name').value;
+                const checks = document.querySelectorAll('.role-check:checked');
+                const permisos = Array.from(checks).map(c => c.value);
+                if (!name || permisos.length === 0) { Swal.showValidationMessage('Datos incompletos'); }
+                return { nombre: name, permisos: permisos };
+            }
+        }).then((result) => { 
+            if (result.isConfirmed) { 
+                App.showLoader(); 
+                App.sendRequest({ action: "save_role", nombre: result.value.nombre, permisos: result.value.permisos }, () => { 
+                    // RECARGA SOLO ROLES Y RE-RENDERIZA LA VISTA ACTUAL
+                    App.sendRequest({ action: "get_roles" }, (resRoles) => {
+                        App.allRoles = resRoles.roles || {};
+                        this.renderRoles();
+                        App.hideLoader();
+                        Swal.fire("Éxito", "Rol guardado y privilegios actualizados", "success");
+                    });
+                }); 
+            } 
+        });
+    },
+    editRole: function(r) { this.formRole(r, App.allRoles[r]); },
+    deleteRole: function(r) {
+        Swal.fire({ title: '¿Eliminar Rol?', text: "Los usuarios con este rol perderán sus accesos", icon: 'warning', showCancelButton: true, confirmButtonColor: '#F24444' }).then((res) => {
+            if (res.isConfirmed) { 
+                App.showLoader(); 
+                App.sendRequest({ action: "delete_role", nombre: r }, () => {
+                    App.sendRequest({ action: "get_roles" }, (resRoles) => {
+                        App.allRoles = resRoles.roles || {};
+                        this.renderRoles();
+                        App.hideLoader();
+                        Swal.fire("Eliminado", "Rol removido del sistema", "success");
+                    });
+                }); 
+            } 
+        });
+    }
+};
+
+/** MÓDULO DISEÑO WEB **/
 const Acc = {
     currentSize: 16,
     init: function() {
@@ -284,15 +338,17 @@ const Acc = {
         const div = document.getElementById('dynamic-view');
         div.style.display = 'block';
         div.innerHTML = `
-            <div class="p-4"><div class="card p-4 border-0 shadow-sm rounded-4">
-                <h5 class="fw-bold mb-4">Ajustes Visuales</h5>
-                <div class="row g-3">
-                    <div class="col-md-4"><button onclick="Acc.darkMode()" class="btn btn-outline-dark w-100 p-3 rounded-4">Modo Oscuro</button></div>
-                    <div class="col-md-4"><button onclick="Acc.changeFont(1)" class="btn btn-outline-primary w-100 p-3 rounded-4">Aumentar Texto</button></div>
-                    <div class="col-md-4"><button onclick="Acc.changeFont(-1)" class="btn btn-outline-primary w-100 p-3 rounded-4">Disminuir Texto</button></div>
-                    <div class="col-12 text-center mt-3"><button onclick="Acc.reset()" class="btn btn-danger rounded-pill px-5">Restablecer Todo</button></div>
+            <div class="p-4 animate__animated animate__fadeIn">
+                <div class="card p-4 border-0 shadow-sm rounded-4 bg-white">
+                    <h5 class="fw-bold mb-4">Ajustes de Apariencia</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4"><button onclick="Acc.darkMode()" class="btn btn-outline-dark w-100 p-3 rounded-4">Modo Oscuro</button></div>
+                        <div class="col-md-4"><button onclick="Acc.changeFont(1)" class="btn btn-outline-primary w-100 p-3 rounded-4">Aumentar Texto</button></div>
+                        <div class="col-md-4"><button onclick="Acc.changeFont(-1)" class="btn btn-outline-primary w-100 p-3 rounded-4">Disminuir Texto</button></div>
+                        <div class="col-12 mt-4 text-center"><button onclick="Acc.reset()" class="btn btn-danger rounded-pill px-5">Restablecer Todo</button></div>
+                    </div>
                 </div>
-            </div></div>`;
+            </div>`;
     },
     darkMode: function() { const v = document.body.classList.toggle('dark-mode'); localStorage.setItem('acc-dark', v); },
     changeFont: function(dir) { this.currentSize += (dir * 2); this.applySize(); },
@@ -300,6 +356,7 @@ const Acc = {
     reset: function() { document.body.className = ''; this.currentSize = 16; this.applySize(); localStorage.clear(); this.render(); }
 };
 
+/** MÓDULO PERFIL ESCUELA **/
 const ModuloEscuela = {
     render: function() {
         document.getElementById('dashboard-view').style.display = 'none';
@@ -307,58 +364,34 @@ const ModuloEscuela = {
         div.style.display = 'block';
         const d = App.schoolData || {};
         div.innerHTML = `
-            <div class="p-4"><div class="card p-4 border-0 shadow-sm rounded-4">
-                <h5 class="fw-bold mb-4 text-primary">Información Institucional</h5>
-                <div class="row g-3">
-                    <div class="col-md-6"><label class="small fw-bold">Nombre</label><input type="text" id="esc-nom" class="form-control rounded-pill px-4" value="${d.nombre||''}"></div>
-                    <div class="col-md-3"><label class="small fw-bold">DEA</label><input type="text" id="esc-dea" class="form-control rounded-pill px-4" value="${d.dea||''}"></div>
-                    <div class="col-md-3"><label class="small fw-bold">RIF</label><input type="text" id="esc-rif" class="form-control rounded-pill px-4" value="${d.rif||''}"></div>
-                    <div class="col-12"><label class="small fw-bold">Dirección</label><input type="text" id="esc-dir" class="form-control rounded-pill px-4" value="${d.direccion||''}"></div>
-                    <div class="col-md-4"><label class="small fw-bold">Misión</label><textarea id="esc-mis" class="form-control rounded-4" rows="3">${d.mision||''}</textarea></div>
-                    <div class="col-md-4"><label class="small fw-bold">Visión</label><textarea id="esc-vis" class="form-control rounded-4" rows="3">${d.vision||''}</textarea></div>
-                    <div class="col-md-4"><label class="small fw-bold">Objetivo</label><textarea id="esc-obj" class="form-control rounded-4" rows="3">${d.objetivo||''}</textarea></div>
-                    <div class="col-12 text-end mt-4"><button onclick="ModuloEscuela.save()" class="btn btn-success px-5 rounded-pill shadow">Actualizar Información</button></div>
+            <div class="p-4 animate__animated animate__fadeIn">
+                <div class="card p-4 border-0 shadow-sm rounded-4 bg-white">
+                    <h5 class="fw-bold mb-4 text-primary">Información Institucional</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="small fw-bold text-muted">Nombre Escuela</label><input type="text" id="esc-nom" class="form-control rounded-pill px-4" value="${d.nombre||''}"></div>
+                        <div class="col-md-3"><label class="small fw-bold text-muted">DEA</label><input type="text" id="esc-dea" class="form-control rounded-pill px-4" value="${d.dea||''}"></div>
+                        <div class="col-md-3"><label class="small fw-bold text-muted">RIF</label><input type="text" id="esc-rif" class="form-control rounded-pill px-4" value="${d.rif||''}"></div>
+                        <div class="col-12"><label class="small fw-bold text-muted">Dirección</label><input type="text" id="esc-dir" class="form-control rounded-pill px-4" value="${d.direccion||''}"></div>
+                        <div class="col-md-4"><label class="small fw-bold text-muted">Misión</label><textarea id="esc-mis" class="form-control rounded-4" rows="3">${d.mision||''}</textarea></div>
+                        <div class="col-md-4"><label class="small fw-bold text-muted">Visión</label><textarea id="esc-vis" class="form-control rounded-4" rows="3">${d.vision||''}</textarea></div>
+                        <div class="col-md-4"><label class="small fw-bold text-muted">Objetivo</label><textarea id="esc-obj" class="form-control rounded-4" rows="3">${d.objetivo||''}</textarea></div>
+                        <div class="col-12 text-end mt-4"><button onclick="ModuloEscuela.save()" class="btn btn-success px-5 rounded-pill shadow">Actualizar Portal</button></div>
+                    </div>
                 </div>
-            </div></div>`;
+            </div>`;
     },
     save: function() {
         const data = { nombre: document.getElementById('esc-nom').value, dea: document.getElementById('esc-dea').value, rif: document.getElementById('esc-rif').value, direccion: document.getElementById('esc-dir').value, mision: document.getElementById('esc-mis').value, vision: document.getElementById('esc-vis').value, objetivo: document.getElementById('esc-obj').value };
-        App.showLoader(); App.sendRequest({ action: "save_school_profile", data: data }, () => { App.loadAppData(); Swal.fire('Éxito', 'Información actualizada', 'success'); });
-    }
-};
-
-const ModuloSoftware = {
-    renderRoles: function() {
-        document.getElementById('dashboard-view').style.display = 'none';
-        const div = document.getElementById('dynamic-view');
-        div.style.display = 'block';
-        let rolesHtml = "";
-        for (let r in App.allRoles) {
-            rolesHtml += `<div class="col-md-4 mb-3"><div class="card p-3 border-0 shadow-sm d-flex flex-row justify-content-between align-items-center rounded-4"><div><h6 class="fw-bold mb-0">${r}</h6><small class="text-muted">${App.allRoles[r].length} privilegios</small></div><div class="d-flex gap-2"><button onclick="ModuloSoftware.editRole('${r}')" class="btn btn-sm btn-light rounded-circle text-primary shadow-sm"><i class="bi bi-pencil"></i></button><button onclick="ModuloSoftware.deleteRole('${r}')" class="btn btn-sm btn-light rounded-circle text-danger shadow-sm"><i class="bi bi-trash"></i></button></div></div></div>`;
-        }
-        div.innerHTML = `<div class="p-4"><div class="d-flex justify-content-between align-items-center mb-4"><h5 class="fw-bold mb-0 text-primary">Gestión de Roles</h5><button onclick="ModuloSoftware.formRole()" class="btn btn-primary px-4 rounded-pill shadow-sm">Nuevo Rol</button></div><div class="row">${rolesHtml}</div></div>`;
-    },
-    formRole: function(rolName = "", currentPerms = []) {
-        let optionsHtml = "";
-        systemStructure.forEach(cat => {
-            optionsHtml += `<div class="col-12 mt-3 mb-2"><span class="badge bg-light text-dark border-0 shadow-sm p-2 px-3 rounded-pill">${cat.category}</span></div>`;
-            cat.items.forEach(item => { optionsHtml += `<div class="col-md-6 mb-1"><div class="form-check"><input class="form-check-input role-check" type="checkbox" value="${item}" id="chk-${item}" ${currentPerms.includes(item) ? 'checked' : ''}><label class="form-check-label small" for="chk-${item}">${item}</label></div></div>`; });
+        App.showLoader(); 
+        App.sendRequest({ action: "save_school_profile", data: data }, () => { 
+            Swal.fire("Éxito", "Perfil institucional actualizado", "success");
+            App.sendRequest({ action: "get_school_profile" }, (resSchool) => {
+                App.schoolData = resSchool;
+                this.render();
+                App.hideLoader();
+            });
         });
-        Swal.fire({
-            title: 'Configurar Privilegios', width: '850px',
-            html: `<input type="text" id="role-name" class="form-control mb-4 rounded-pill px-4 shadow-none" placeholder="Nombre Rol" value="${rolName}" ${rolName ? 'disabled' : ''}><div class="row text-start" style="max-height: 400px; overflow-y: auto;">${optionsHtml}</div>`,
-            showCancelButton: true, confirmButtonText: 'Guardar', confirmButtonColor: '#1e2b5e',
-            preConfirm: () => {
-                const name = document.getElementById('role-name').value;
-                const checks = document.querySelectorAll('.role-check:checked');
-                const permisos = Array.from(checks).map(c => c.value);
-                if (!name || permisos.length === 0) { Swal.showValidationMessage('Datos incompletos'); }
-                return { nombre: name, permisos: permisos };
-            }
-        }).then((result) => { if (result.isConfirmed) { App.showLoader(); App.sendRequest({ action: "save_role", nombre: result.value.nombre, permisos: result.value.permisos }, () => { App.loadAppData(); }); } });
-    },
-    editRole: function(r) { this.formRole(r, App.allRoles[r]); },
-    deleteRole: function(r) { Swal.fire({ title: '¿Eliminar Rol?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#F24444' }).then((res) => { if (res.isConfirmed) { App.showLoader(); App.sendRequest({ action: "delete_role", nombre: r }, () => { App.loadAppData(); }); } }); }
+    }
 };
 
 const Simon = {
