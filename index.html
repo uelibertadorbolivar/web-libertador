@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UE Libertador Bolívar - Portal Educativo</title>
+    <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <!-- CARGADOR -->
+    <div id="main-loader" class="loader-overlay">
+        <div class="loader-box">
+            <div class="loader-ring"></div>
+            <img src="assets/img/logo.png" class="loader-img">
+        </div>
+    </div>
+
+    <!-- PANTALLA LOGIN -->
+    <div id="login-screen" class="login-wrapper">
+        <div class="login-main-container">
+            <div class="login-grid">
+                <!-- Lado Visual -->
+                <div class="login-visual d-none d-lg-flex">
+                    <div class="organic-waves">
+                        <div class="wave wave1"></div>
+                        <div class="wave wave2"></div>
+                        <div class="wave wave3"></div>
+                    </div>
+                    <div class="visual-content animate__animated animate__fadeInLeft text-center">
+                        <img src="assets/img/logo.png" width="130" class="mb-4 bg-white rounded-circle p-2 shadow-lg">
+                        <h2 class="fw-bold text-white">SIGAE</h2>
+                        <p class="small text-white-50">Portal Educativo Institucional</p>
+                    </div>
+                </div>
+
+                <!-- Lado Formulario -->
+                <div class="login-form-container d-flex align-items-center justify-content-center p-4">
+                    <div class="card border-0 w-100 animate__animated animate__zoomIn bg-transparent">
+                        <div class="card-body p-4 p-md-5 text-center">
+                            <h3 class="fw-bold mb-1" style="color: #0085FF;">¡Bienvenido!</h3>
+                            <p class="text-muted small mb-4">Acceso Institucional</p>
+                            
+                            <div id="login-flow">
+                                <!-- PASO 1 -->
+                                <div id="step-cedula">
+                                    <div class="form-floating mb-3">
+                                        <input type="number" id="inputCedula" class="form-control rounded-pill px-4 shadow-none border" placeholder="Cédula">
+                                        <label class="px-4 text-muted">Cédula de Identidad</label>
+                                    </div>
+                                    <button onclick="App.verificarUsuario()" class="btn btn-primary-vibrant w-100 py-3 rounded-pill shadow">Continuar</button>
+                                    <button onclick="App.modalInvitado()" class="btn btn-link btn-sm mt-3 text-secondary text-decoration-none">Entrar como Invitado</button>
+                                </div>
+                                <!-- PASO 2 -->
+                                <div id="step-login" style="display:none;">
+                                    <div class="badge bg-light text-primary p-2 px-3 mb-3 border w-100"><span id="lbl-nombre-login"></span></div>
+                                    <div class="input-group mb-3">
+                                        <div class="form-floating flex-grow-1">
+                                            <input type="password" id="inputPass" class="form-control rounded-start-pill px-4 shadow-none border" placeholder="Clave">
+                                            <label class="px-4 text-muted">Contraseña</label>
+                                        </div>
+                                        <button class="btn btn-outline-vibrant rounded-end-pill px-3" type="button" onclick="App.togglePass('inputPass')"><i class="bi bi-eye"></i></button>
+                                    </div>
+                                    <button onclick="App.login()" class="btn btn-success-vibrant w-100 rounded-pill py-3 shadow">Ingresar</button>
+                                    <button onclick="App.showForgot()" class="btn btn-link btn-sm mt-2 text-muted text-decoration-none">¿Olvidó su contraseña?</button>
+                                </div>
+                                <!-- PASO 3 -->
+                                <div id="step-register" style="display:none;">
+                                    <div class="alert alert-info-vibrant py-2 small mb-3" style="background:#e0f7fa; color:#006064;">Configure su seguridad</div>
+                                    <div class="input-group mb-2">
+                                        <input type="password" id="regPass" class="form-control rounded-start-pill px-4 border-end-0 shadow-none" placeholder="Nueva Clave">
+                                        <button class="btn btn-outline-vibrant rounded-end-pill px-3" type="button" onclick="App.togglePass('regPass')"><i class="bi bi-eye"></i></button>
+                                    </div>
+                                    <select id="regPregunta" class="form-select mb-2 py-3 rounded-pill px-4 shadow-none small border">
+                                        <option value="">Pregunta Secreta</option>
+                                        <option>¿Nombre de su mascota?</option>
+                                        <option>¿Ciudad de nacimiento?</option>
+                                        <option>¿Nombre de su escuela primaria?</option>
+                                    </select>
+                                    <input type="text" id="regRespuesta" class="form-control mb-3 py-3 rounded-pill px-4 shadow-none border" placeholder="Respuesta">
+                                    <button onclick="App.registrarClave()" class="btn btn-warning-vibrant w-100 rounded-pill py-3 text-white">Activar</button>
+                                </div>
+                                <!-- PASO 4 -->
+                                <div id="step-forgot" style="display:none;">
+                                    <p class="small text-primary mb-2 fw-bold" id="lbl-pregunta"></p>
+                                    <input type="text" id="recRespuesta" class="form-control mb-2 py-3 rounded-pill px-4 shadow-none border" placeholder="Respuesta">
+                                    <div class="input-group mb-3">
+                                        <input type="password" id="recNewPass" class="form-control rounded-start-pill px-4 border-end-0 shadow-none" placeholder="Nueva Clave">
+                                        <button class="btn btn-outline-vibrant rounded-end-pill px-3" type="button" onclick="App.togglePass('recNewPass')"><i class="bi bi-eye"></i></button>
+                                    </div>
+                                    <button onclick="App.recuperarClave()" class="btn btn-danger-vibrant w-100 rounded-pill py-3 shadow">Restablecer</button>
+                                    <button onclick="location.reload()" class="btn btn-link btn-sm mt-2 text-muted text-decoration-none"><i class="bi bi-arrow-left"></i> Regresar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ESTRUCTURA APP -->
+    <div id="app-wrapper" style="display: none;">
+        <aside id="sidebar" class="sidebar-main">
+            <div class="sidebar-header" onclick="App.showDashboard()" style="cursor: pointer;">
+                <img src="assets/img/logo.png" width="45">
+                <div class="ms-3 text-dark text-start sidebar-text-header">
+                    <div class="fw-bold small">UE Libertador Bolívar</div>
+                    <div style="font-size: 0.6rem; color: #718096;">Gestión Administrativa</div>
+                </div>
+                <button class="btn btn-link text-secondary ms-auto p-0 d-none d-lg-block" onclick="App.toggleCollapse()"><i class="bi bi-list-task fs-4"></i></button>
+                <button class="btn btn-link text-secondary ms-auto p-0 d-lg-none" onclick="App.toggleSidebar()"><i class="bi bi-x-lg fs-4"></i></button>
+            </div>
+            <div id="sidebar-menu" class="accordion accordion-flush mt-3"></div>
+        </aside>
+
+        <main id="main-content">
+            <header class="navbar sticky-top bg-white border-bottom px-4 py-3 shadow-sm">
+                <button class="btn btn-light d-lg-none me-3" onclick="App.toggleSidebar()"><i class="bi bi-list fs-4"></i></button>
+                <h6 class="mb-0 fw-bold text-secondary text-truncate" id="page-title">Cargando...</h6>
+                <div class="ms-auto d-flex align-items-center">
+                    <span class="small fw-medium me-3 text-muted d-none d-md-inline" id="user-display-name"></span>
+                    <button class="btn btn-light text-danger rounded-circle shadow-sm ms-2 border" onclick="App.logout()" title="Cerrar Sesión"><i class="bi bi-power"></i></button>
+                </div>
+            </header>
+            <div id="dashboard-view"></div>
+            <div id="dynamic-view" style="display:none;"></div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
