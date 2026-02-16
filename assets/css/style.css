@@ -1,0 +1,250 @@
+/* 
+ * SIGAE v3.1 - HOJA DE ESTILOS CONSOLIDADA
+ * UE Libertador Bolívar
+ */
+
+:root {
+    --brand-blue: #0085FF;
+    --brand-cyan: #00C3FF;
+    --brand-magenta: #E5007E;
+    --brand-orange: #FF8D00;
+    --brand-green: #00D158;
+    --sidebar-bg: #ffffff;
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 85px;
+    --base-font-size: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html { font-size: var(--base-font-size); scroll-behavior: smooth; }
+
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: #f0f2f5; 
+    margin: 0; 
+    overflow-x: hidden; 
+    color: #2d3748;
+    transition: background 0.3s, color 0.3s; 
+}
+
+/* --- ACCESIBILIDAD Y MODO OSCURO --- */
+body.dark-mode { background-color: #1a202c !important; color: #edf2f7 !important; }
+body.dark-mode .card, 
+body.dark-mode header, 
+body.dark-mode .bg-white,
+body.dark-mode aside { 
+    background-color: #2d3748 !important; 
+    border-color: #4a5568 !important; 
+    color: white !important; 
+}
+body.dark-mode .table, body.dark-mode .table td, body.dark-mode .table th { color: #e2e8f0 !important; border-color: #4a5568 !important; }
+body.dark-mode .bg-light { background-color: #4a5568 !important; color: white !important; }
+body.dark-mode .nav-category-btn { color: #cbd5e1 !important; }
+
+body.acc-grayscale { filter: grayscale(100%); }
+body.readable-font { font-family: 'Arial', sans-serif !important; }
+
+/* --- LOADER GLOBAL --- */
+.loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+.loader-box { position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; }
+.loader-ring { position: absolute; width: 100%; height: 100%; border: 4px solid #f3f3f3; border-top: 4px solid var(--brand-blue); border-radius: 50%; animation: spin 1s linear infinite; }
+.loader-img { width: 60px; height: 60px; object-fit: contain; z-index: 10; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* --- LOGIN MODERNO --- */
+.login-wrapper { background: #f0f2f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.login-main-container { width: 100%; max-width: 1000px; }
+.login-grid { 
+    display: grid; 
+    grid-template-columns: 1.1fr 1fr; 
+    background: white; 
+    border-radius: 40px; 
+    overflow: hidden; 
+    box-shadow: 0 25px 50px rgba(0,0,0,0.06); 
+    min-height: 600px;
+}
+.login-visual { 
+    background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-cyan) 100%); 
+    position: relative; 
+    padding: 60px; 
+    color: white; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    overflow: hidden; 
+}
+.visual-content { z-index: 10; text-align: center; }
+.organic-waves .wave { position: absolute; bottom: 0; left: 0; width: 200%; height: 100%; border-radius: 45%; }
+.wave1 { background: white; animation: rotate 15s linear infinite; bottom: -50%; opacity: 0.1; }
+.wave2 { background: var(--brand-magenta); animation: rotate 10s linear infinite; bottom: -52%; opacity: 0.2; }
+.wave3 { background: var(--brand-orange); animation: rotate 20s linear infinite; bottom: -48%; opacity: 0.2; }
+@keyframes rotate { 100% { transform: rotate(360deg); } }
+
+/* --- ESTRUCTURA SPA (PC) --- */
+.sidebar-main { 
+    width: var(--sidebar-width); 
+    height: 100vh; 
+    position: fixed; 
+    background: var(--sidebar-bg); 
+    z-index: 1100; 
+    overflow-y: auto; 
+    border-right: 1px solid #e2e8f0; 
+    transition: var(--transition); 
+}
+.sidebar-header { padding: 25px 20px; background: white; border-bottom: 1px solid #f0f2f5; display: flex; align-items: center; }
+
+#main-content { 
+    margin-left: var(--sidebar-width); 
+    min-height: 100vh; 
+    transition: var(--transition); 
+    display: flex;
+    flex-direction: column;
+}
+
+#module-content { width: 100%; }
+
+body.collapsed .sidebar-main { width: var(--sidebar-collapsed-width); }
+body.collapsed #main-content { margin-left: var(--sidebar-collapsed-width); }
+body.collapsed .sidebar-text-header, 
+body.collapsed .nav-category-btn span span, 
+body.collapsed .bi-chevron-down { display: none !important; }
+body.collapsed .nav-category-btn { justify-content: center; padding: 15px 0; }
+
+.nav-category-btn { 
+    background: transparent !important; 
+    color: #4a5568 !important; 
+    border: none !important; 
+    width: 100%; 
+    padding: 14px 20px; 
+    font-size: 0.88rem; 
+    font-weight: 600; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    transition: 0.2s;
+}
+.nav-category-btn:hover { background: #f8fafc !important; color: var(--brand-blue) !important; }
+.nav-sub-item { 
+    padding: 10px 20px 10px 55px; 
+    display: block; 
+    color: #64748b; 
+    text-decoration: none; 
+    font-size: 0.82rem; 
+    transition: 0.2s; 
+    border-radius: 50px; 
+    margin: 2px 15px; 
+}
+.nav-sub-item:hover { color: var(--brand-blue); background: #eff6ff; }
+
+/* --- COMPONENTES VIBRANTES --- */
+.btn-primary-vibrant { background: var(--brand-blue); color: white; border: none; font-weight: 600; }
+.btn-primary-vibrant:hover { background: #0077e6; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 133, 255, 0.2); }
+.btn-success-vibrant { background: var(--brand-green); color: white; border: none; font-weight: 600; }
+.btn-warning-vibrant { background: var(--brand-orange); color: white; border: none; font-weight: 600; }
+.btn-danger-vibrant { background: var(--brand-magenta); color: white; border: none; font-weight: 600; }
+
+.card { border: none; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.dash-card { border-radius: 20px; background: white; padding: 25px; transition: var(--transition); border-left: 8px solid var(--brand-blue); height: 100%; }
+.dash-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
+
+.border-left-blue { border-left-color: var(--brand-blue); }
+.border-left-green { border-left-color: var(--brand-green); }
+.border-left-yellow { border-left-color: var(--brand-orange); }
+.border-left-red { border-left-color: var(--brand-magenta); }
+
+/* --- ORGANIGRAMA PROFESIONAL --- */
+#capture-zone {
+    background-color: #ffffff;
+    background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.org-tree-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+}
+
+.org-node-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.org-children {
+    display: flex;
+    position: relative;
+    padding-top: 40px;
+}
+
+/* Línea vertical que baja del padre */
+.org-node-group > .org-children::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 2px solid #cbd5e1;
+    height: 40px;
+}
+
+/* Línea horizontal que conecta hermanos */
+.org-children > .org-node-group::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    border-top: 2px solid #cbd5e1;
+}
+
+.org-children > .org-node-group:first-child::after { left: 50%; width: 50%; }
+.org-children > .org-node-group:last-child::after { width: 50%; }
+.org-children > .org-node-group:only-child::after { display: none; }
+
+/* Línea vertical que sube de cada hijo */
+.org-children > .org-node-group::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 2px solid #cbd5e1;
+    height: 20px;
+}
+
+.org-card {
+    background: white;
+    padding: 15px 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+    border-top: 5px solid var(--brand-blue) !important;
+    position: relative;
+    z-index: 10;
+    transition: transform 0.2s;
+    min-width: 180px;
+}
+.org-card:hover { transform: scale(1.05); }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 992px) {
+    .login-grid { grid-template-columns: 1fr; border-radius: 20px; }
+    .login-visual { height: 260px; padding: 30px; }
+    .sidebar-main { left: calc(var(--sidebar-width) * -1); }
+    #main-content { margin-left: 0 !important; }
+    body.sidebar-open .sidebar-main { left: 0; box-shadow: 15px 0 50px rgba(0,0,0,0.1); }
+    
+    /* En móvil el organigrama permite scroll libre */
+    .org-tree-wrapper { padding: 20px; }
+}
+
+/* --- UTILIDADES --- */
+.cursor-pointer { cursor: pointer; }
+.rounded-pill { border-radius: 50px !important; }
+.shadow-none { box-shadow: none !important; }
+.form-control:focus, .form-select:focus { 
+    border-color: var(--brand-blue); 
+    box-shadow: 0 0 0 4px rgba(0, 133, 255, 0.1); 
+}
+.badge { font-weight: 600; padding: 0.5em 1em; border-radius: 8px; }
