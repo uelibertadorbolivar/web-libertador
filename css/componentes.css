@@ -1,0 +1,145 @@
+/* =======================================================
+   SIGAE - COMPONENTES (TARJETAS, TABLAS, ALERTAS)
+========================================================== */
+
+/* --- CONTENEDORES PRINCIPALES --- */
+.contenedor-dinamico {
+    animation: fadeUpIn 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+/* --- TARJETAS (CARDS) --- */
+.tarjeta-modulo {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    transition: var(--transicion-rapida);
+}
+.tarjeta-modulo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 102, 255, 0.1);
+}
+
+.tarjeta-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tarjeta-body {
+    padding: 25px;
+}
+
+/* --- INSIGNIAS (BADGES) --- */
+.usuario-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 102, 255, 0.1);
+    color: var(--color-primario);
+    padding: 8px 15px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* --- TABLAS MODERNAS --- */
+.tabla-moderna {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+.tabla-moderna th {
+    font-weight: 700;
+    color: #a0aec0;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    padding: 10px 20px;
+    border: none;
+}
+.tabla-moderna tbody tr {
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+    transition: var(--transicion-rapida);
+    border-radius: 15px;
+}
+.tabla-moderna tbody tr td {
+    padding: 15px 20px;
+    vertical-align: middle;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+.tabla-moderna tbody tr td:first-child {
+    border-left: 1px solid transparent;
+    border-radius: 15px 0 0 15px;
+}
+.tabla-moderna tbody tr td:last-child {
+    border-right: 1px solid transparent;
+    border-radius: 0 15px 15px 0;
+}
+.tabla-moderna tbody tr:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 25px rgba(0, 102, 255, 0.08);
+    background: #f8fafc;
+}
+
+/* --- BOTONES DE ACCIÓN PEQUEÑOS --- */
+.btn-circulo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: var(--transicion-rapida);
+    cursor: pointer;
+}
+.btn-circulo.btn-peligro {
+    background: rgba(255, 61, 0, 0.1);
+    color: var(--color-peligro);
+}
+.btn-circulo.btn-peligro:hover {
+    background: var(--color-peligro);
+    color: white;
+    transform: rotate(15deg);
+}
+
+/* --- UTILIDADES --- */
+.hover-efecto { transition: 0.3s; }
+.hover-efecto:hover { transform: translateX(5px); color: var(--color-primario) !important; }
+
+/* =======================================================
+   REGLAS PARA TELÉFONOS (RESPONSIVIDAD MÓVIL)
+========================================================== */
+@media (max-width: 768px) {
+    /* Reducimos los espacios internos de las tarjetas */
+    .tarjeta-header { padding: 15px; }
+    .tarjeta-body { padding: 15px; }
+    
+    /* Achicamos un poco las letras y los botones de las tablas */
+    .tabla-moderna th, .tabla-moderna tbody tr td {
+        padding: 10px 10px;
+        font-size: 0.85rem;
+    }
+    .btn-circulo {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+    
+    /* Ajuste para que el contenedor de la tabla permita deslizar con el dedo (scroll horizontal) sin romper la tarjeta */
+    .table-responsive {
+        border-radius: 15px;
+        padding-bottom: 10px;
+    }
+}
+
+/* Evitar que los botones de acción se partan en dos líneas */
+.celda-acciones {
+    white-space: nowrap;
+    min-width: 100px;
+}
