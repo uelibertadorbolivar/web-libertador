@@ -1,0 +1,62 @@
+<div class="row g-4 animate__animated animate__fadeInUp">
+    <!-- COLUMNA AÑOS ESCOLARES -->
+    <div class="col-lg-7">
+        <div class="tarjeta-modulo h-100">
+            <div class="tarjeta-header bg-gradiente-principal text-white">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3 shadow" style="width: 45px; height: 45px;">
+                        <i class="bi bi-calendar3 fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Años Escolares</h5>
+                        <small class="opacity-75">Períodos anuales del sistema</small>
+                    </div>
+                </div>
+                <button onclick="ModEscuela.modalAnio()" class="btn btn-light text-primary fw-bold rounded-pill px-3 shadow-sm hover-efecto">
+                    <i class="bi bi-plus-lg me-1"></i> Nuevo
+                </button>
+            </div>
+            <div class="tarjeta-body p-0">
+                <div class="table-responsive px-4 pb-4">
+                    <table class="tabla-moderna">
+                        <thead>
+                            <tr>
+                                <th>Nombre del Año</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-anios">
+                            <tr><td colspan="3" class="text-center text-muted">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COLUMNA LAPSOS / FASES -->
+    <div class="col-lg-5">
+        <div class="tarjeta-modulo h-100">
+            <div class="tarjeta-header bg-white border-bottom-0 pt-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 45px; height: 45px;">
+                        <i class="bi bi-clock-history fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark">Lapsos / Fases</h5>
+                        <small class="text-muted">Momentos de evaluación</small>
+                    </div>
+                </div>
+                <button onclick="ModEscuela.modalPeriodo()" class="btn-circulo" style="background: rgba(0,102,255,0.1); color: var(--color-primario);">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            <div class="tarjeta-body pt-2">
+                <div id="lista-periodos" class="d-flex flex-column gap-2">
+                    <div class="text-center text-muted">Cargando...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

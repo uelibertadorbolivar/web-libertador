@@ -1,0 +1,57 @@
+<div class="row g-4 animate__animated animate__fadeInUp">
+    <div class="col-12">
+        <div class="tarjeta-modulo">
+            <div class="tarjeta-header bg-gradiente-principal text-white" style="border-radius: 20px;">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3 shadow" style="width: 50px; height: 50px;">
+                        <i class="bi bi-journal-richtext fs-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">Asignar Carga Académica</h4>
+                        <small class="opacity-75">Configura el horario vinculando asignaturas y docentes por sección</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tarjeta-body p-4">
+                <!-- SELECTORES -->
+                <div class="row g-3 bg-light p-3 rounded-4 border mb-4 shadow-sm align-items-end">
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted ps-1 mb-1">1. Nivel Educativo</label>
+                        <select id="ca-nivel" class="input-moderno bg-white" onchange="ModDocentes.caSelectNivel()">
+                            <option value="">Cargando...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted ps-1 mb-1">2. Grado / Año</label>
+                        <select id="ca-grado" class="input-moderno bg-white" onchange="ModDocentes.caSelectGrado()" disabled>
+                            <option value="">-- Primero seleccione Nivel --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted ps-1 mb-1">3. Sección</label>
+                        <select id="ca-seccion" class="input-moderno bg-white" onchange="ModDocentes.caDibujarGrid()" disabled>
+                            <option value="">-- Seleccione Grado --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button onclick="ModDocentes.caGuardar()" class="btn-moderno btn-primario w-100 shadow" id="btn-guardar-ca" disabled>
+                            <i class="bi bi-floppy-fill me-2"></i> Guardar Carga
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GRID DEL HORARIO -->
+                <div class="overflow-auto bg-secondary bg-opacity-10 p-3 p-md-4 rounded-4 shadow-inner" style="min-height: 400px;">
+                    <div id="ca-grid" class="bg-white shadow-sm mx-auto p-3 position-relative" style="min-width: 900px; border-radius: 10px;">
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar3 d-block fs-1 mb-2 text-primary opacity-50"></i>
+                            Seleccione Nivel, Grado y Sección para visualizar y editar el horario.
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
