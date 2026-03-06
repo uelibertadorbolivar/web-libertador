@@ -1,0 +1,95 @@
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white">
+            <div class="burbuja-3d burbuja-1"></div><div class="burbuja-3d burbuja-2"></div><div class="burbuja-3d burbuja-3"></div>
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-7 text-center text-md-start mb-4 mb-md-0">
+                    <span class="badge bg-white text-primary mb-2 shadow-sm" style="font-weight: 800; letter-spacing: 1px;"><i class="bi bi-people-fill me-1"></i> SEGURIDAD</span>
+                    <h2 class="fw-bolder mb-2 text-white" style="font-size: 2.2rem;">Gestión de Usuarios</h2>
+                    <p class="mb-0 text-white-50 fw-bold fs-5">Administra los accesos, roles y estado de las cuentas.</p>
+                </div>
+                <div class="col-md-5 text-center text-md-end">
+                    <div class="fondo-logo-blanco"><img src="assets/img/logo.png" alt="Logo" class="img-fluid logo-animado-banner" style="max-height: 100px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4 align-items-center">
+    <div class="col-12 d-flex flex-wrap justify-content-center justify-content-md-end gap-2">
+        <input type="file" id="input-excel-usuarios" accept=".xlsx, .xls, .csv" style="display: none;" onchange="ModSeguridad.procesarExcel(event)">
+        
+        <button class="btn btn-outline-danger fw-bold shadow-sm align-items-center" onclick="ModSeguridad.eliminarSeleccionados()" id="btn-eliminar-masivo" style="display:none;">
+            <i class="bi bi-trash-fill fs-5 me-2"></i> Eliminar Seleccionados
+        </button>
+
+        <button class="btn btn-outline-success fw-bold shadow-sm d-flex align-items-center" onclick="ModSeguridad.descargarPlantilla()"><i class="bi bi-file-earmark-excel-fill fs-5 me-2"></i> Plantilla Excel</button>
+        <button class="btn btn-outline-primary fw-bold shadow-sm d-flex align-items-center" onclick="document.getElementById('input-excel-usuarios').click()"><i class="bi bi-cloud-arrow-up-fill fs-5 me-2"></i> Carga Masiva</button>
+        <button class="btn-moderno btn-primario shadow-sm px-4 d-flex align-items-center" onclick="ModSeguridad.abrirModalUsuario()"><i class="bi bi-person-plus-fill fs-5 me-2"></i> Añadir Usuario</button>
+    </div>
+</div>
+
+<div class="tarjeta-modulo p-4 bg-white shadow-sm animate__animated animate__fadeInUp">
+    <div class="row g-3 mb-4">
+        <div class="col-md-8"><div class="input-grupo-moderno"><i class="bi bi-search ms-3 text-muted"></i><input type="text" id="buscador-usuarios" class="form-control border-0 bg-transparent shadow-none" placeholder="Buscar por nombre o cédula..." onkeyup="ModSeguridad.filtrarUsuarios()"></div></div>
+        <div class="col-md-4"><select id="filtro-rol-usuarios" class="form-select input-moderno py-2" onchange="ModSeguridad.filtrarUsuarios()"><option value="Todos">Todos los Roles</option></select></div>
+    </div>
+    
+    <div class="table-responsive rounded-4 border">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="px-4 py-3" style="width: 50px;"><input class="form-check-input border-secondary" type="checkbox" id="chk-todos-usuarios" onclick="ModSeguridad.toggleTodosUsuarios(this)"></th>
+                    <th class="py-3 text-muted fw-bold">Usuario</th>
+                    <th class="py-3 text-muted fw-bold">Cédula</th>
+                    <th class="py-3 text-muted fw-bold">Rol Principal</th>
+                    <th class="py-3 text-muted fw-bold">Estado</th>
+                    <th class="px-4 py-3 text-end text-muted fw-bold">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-usuarios"><tr><td colspan="6" class="text-center py-5 text-muted">Cargando usuarios...</td></tr></tbody>
+        </table>
+    </div>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 pt-3 border-top">
+        <span class="text-muted small fw-bold mb-3 mb-md-0" id="info-paginacion">Mostrando 0 de 0</span>
+        <div class="btn-group shadow-sm">
+            <button class="btn btn-outline-secondary px-3" onclick="ModSeguridad.cambiarPagina(-1)"><i class="bi bi-chevron-left me-1"></i> Anterior</button>
+            <button class="btn btn-outline-secondary px-3" onclick="ModSeguridad.cambiarPagina(1)">Siguiente <i class="bi bi-chevron-right ms-1"></i></button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-nuevo-usuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 shadow-lg rounded-4"><div class="modal-header bg-light border-0 py-3"><h5 class="modal-title fw-bold text-dark"><i class="bi bi-person-plus text-primary me-2"></i> Registrar Nuevo Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ModSeguridad.cerrarModalYLimpiar('modal-nuevo-usuario')"></button></div><div class="modal-body p-4"><div class="alert alert-info border-0 small mb-4"><i class="bi bi-info-circle-fill me-1"></i> El usuario se creará sin contraseña. Deberá configurar su cuenta la primera vez.</div><label class="small fw-bold text-muted mb-1">Cédula de Identidad</label><input type="number" id="nuevo-usr-cedula" class="input-moderno mb-3" placeholder="Ej: 15000000"><label class="small fw-bold text-muted mb-1">Nombre Completo</label><input type="text" id="nuevo-usr-nombre" class="input-moderno mb-3" placeholder="Nombre y Apellido"><label class="small fw-bold text-muted mb-1">Asignar Rol</label><select id="nuevo-usr-rol" class="input-moderno mb-2"><option value="" disabled selected>-- Seleccione --</option></select></div><div class="modal-footer border-0 bg-light p-3"><button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal" onclick="ModSeguridad.cerrarModalYLimpiar('modal-nuevo-usuario')">Cancelar</button><button type="button" class="btn-moderno btn-primario py-2 px-4 shadow-sm" onclick="ModSeguridad.guardarNuevoUsuario()">Registrar</button></div></div></div>
+</div>
+
+<div class="modal fade" id="modal-editar-usuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-light border-0 py-3"><h5 class="modal-title fw-bold text-dark"><i class="bi bi-pencil-square text-primary me-2"></i> Perfil Completo del Usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ModSeguridad.cerrarModalYLimpiar('modal-editar-usuario')"></button></div>
+            <div class="modal-body p-4">
+                <div class="row g-3">
+                    <div class="col-12"><h6 class="fw-bold text-primary border-bottom pb-2 mb-0">Información Personal y de Sistema</h6></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Cédula de Identidad</label><input type="number" id="edit-usr-cedula" class="input-moderno mb-2"></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Nombre Completo</label><input type="text" id="edit-usr-nombre" class="input-moderno mb-2"></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Rol del Sistema</label><select id="edit-usr-rol" class="input-moderno mb-2"></select></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Estado de Cuenta</label><select id="edit-usr-estado" class="input-moderno mb-2"><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option><option value="Bloqueado">Bloqueado</option></select></div>
+                    
+                    <div class="col-12 mt-3"><h6 class="fw-bold text-primary border-bottom pb-2 mb-0">Datos de Contacto y Seguridad</h6></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Correo Electrónico</label><input type="email" id="edit-usr-email" class="input-moderno mb-2" placeholder="No registrado aún"></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Teléfono</label><input type="text" id="edit-usr-telefono" class="input-moderno mb-2" placeholder="No registrado aún"></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Pregunta de Seguridad 1</label><select id="edit-usr-preg1" class="input-moderno mb-2 text-muted"></select></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Respuesta 1</label><input type="text" id="edit-usr-resp1" class="input-moderno mb-2" placeholder="Respuesta 1"></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Pregunta de Seguridad 2</label><select id="edit-usr-preg2" class="input-moderno mb-3 text-muted"></select></div>
+                    <div class="col-md-6"><label class="small fw-bold text-muted mb-1">Respuesta 2</label><input type="text" id="edit-usr-resp2" class="input-moderno mb-3" placeholder="Respuesta 2"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 bg-light p-3">
+                <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal" onclick="ModSeguridad.cerrarModalYLimpiar('modal-editar-usuario')">Cancelar</button>
+                <button type="button" class="btn-moderno btn-primario py-2 px-4 shadow-sm" onclick="ModSeguridad.guardarEdicionUsuario()">Actualizar Todo</button>
+            </div>
+        </div>
+    </div>
+</div>
