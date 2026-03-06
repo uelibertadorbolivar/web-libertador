@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGAE - UE Libertador Bolívar</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0066FF">
+    <link rel="apple-touch-icon" href="assets/img/logo.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" type="image/png" href="assets/img/logo.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="css/principal.css">
+    <link rel="stylesheet" href="css/componentes.css">
+</head>
+<body>
+
+    <div class="fondo-animado"><div class="esfera esfera-1"></div><div class="esfera esfera-2"></div><div class="esfera esfera-3"></div></div>
+
+    <div id="pantalla-carga" class="glass-loader flex-column">
+        <div class="contenedor-logo-magico mx-auto">
+            <div class="anillo-loader-1"></div><div class="anillo-loader-2"></div><div class="pulso-trasero"></div>
+            <img src="assets/img/logo.png" width="90" class="logo-flotante-magico" alt="Logo">
+        </div>
+        <div class="texto-cargando mt-4 animate__animated animate__fadeIn">
+            <span class="fw-bolder" style="color: var(--color-primario); font-size: 1.2rem; letter-spacing: 3px;">CARGANDO</span><span class="puntos-animados"></span>
+        </div>
+        <div class="barra-progreso-contenedor mt-3 shadow-sm animate__animated animate__fadeInUp"><div class="barra-progreso-animada"></div></div>
+    </div>
+
+    <div id="vista-login" class="contenedor-login flex-column" style="display: none;">
+        <div class="tarjeta-login-magica glass-panel animate__animated animate__zoomIn mb-4" style="z-index: 10;">
+            <div class="contenedor-logo-magico mx-auto">
+                <div class="anillo-loader-1"></div><div class="anillo-loader-2"></div><div class="pulso-trasero"></div>
+                <img src="assets/img/logo.png" width="90" class="logo-flotante-magico" alt="Logo">
+            </div>
+            <div class="text-center mt-4 mb-5">
+                <span class="subtitulo-brillante animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">Sistema Integral de Gestión y Administración Escolar</span>
+                <h1 class="titulo-colegio-shimmer fw-bolder mt-2 animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">Unidad Educativa<br>Libertador Bolívar</h1>
+            </div>
+            
+            <div class="login-formulario bg-white rounded-4 shadow-sm mx-auto animate__animated animate__fadeInUp" style="animation-delay: 0.7s;">
+                <h4 class="fw-bold mb-4 text-center" style="color: var(--color-primario);">¡Bienvenido!</h4>
+                <div id="paso-cedula">
+                    <input type="number" id="inputCedula" class="input-moderno mb-3" placeholder="Ingresa tu Cédula">
+                    <button onclick="Aplicacion.verificarUsuario()" class="btn-moderno btn-primario w-100 mb-3">Siguiente <i class="bi bi-arrow-right"></i></button>
+                    <button onclick="Aplicacion.accesoInvitado()" class="btn btn-link text-muted w-100 text-decoration-none hover-efecto">Acceder como Invitado</button>
+                </div>
+                <div id="paso-clave" style="display:none;" class="animate__animated animate__fadeInRight">
+                    <div class="usuario-badge mb-4 w-100 justify-content-center"><i class="bi bi-person-circle me-2"></i><span id="lbl-nombre-login"></span></div>
+                    <div class="input-grupo-moderno mb-4">
+                        <input type="password" id="inputClave" class="input-moderno sin-borde-derecho" placeholder="Contraseña">
+                        <button class="btn-ojo" onclick="Aplicacion.alternarClave('inputClave')"><i class="bi bi-eye"></i></button>
+                    </div>
+                    <button onclick="Aplicacion.iniciarSesion()" class="btn-moderno btn-exito w-100 mb-2">Ingresar <i class="bi bi-box-arrow-in-right"></i></button>
+                    <button onclick="location.reload()" class="btn btn-link text-muted w-100 text-decoration-none">Atrás</button>
+                </div>
+                
+                <div id="paso-primer-ingreso" style="display:none;" class="animate__animated animate__fadeInUp">
+                    <h5 class="fw-bold mb-3 text-center text-primary"><i class="bi bi-shield-lock-fill me-2"></i>Configura tu Cuenta</h5>
+                    <div class="row g-2">
+                        <div class="col-12"><input type="text" id="pi-nombre" class="input-moderno mb-2" placeholder="Nombre y Apellido" disabled style="background-color: #f8f9fa;"></div>
+                        <div class="col-12 col-sm-6"><input type="email" id="pi-email" class="input-moderno mb-2" placeholder="Correo"></div>
+                        <div class="col-12 col-sm-6"><input type="text" id="pi-telefono" class="input-moderno mb-2" placeholder="Teléfono"></div>
+                        <div class="col-12"><select id="pi-preg1" class="input-moderno mb-2 text-muted"><option value="" disabled selected>-- Cargando preguntas... --</option></select></div>
+                        <div class="col-12"><input type="text" id="pi-resp1" class="input-moderno mb-2" placeholder="Respuesta 1"></div>
+                        <div class="col-12"><select id="pi-preg2" class="input-moderno mb-2 text-muted"><option value="" disabled selected>-- Cargando preguntas... --</option></select></div>
+                        <div class="col-12"><input type="text" id="pi-resp2" class="input-moderno mb-3" placeholder="Respuesta 2"></div>
+                        <div class="col-12 col-sm-6"><input type="password" id="pi-clave1" class="input-moderno mb-2" placeholder="Nueva Clave"></div>
+                        <div class="col-12 col-sm-6"><input type="password" id="pi-clave2" class="input-moderno mb-3" placeholder="Confirmar Clave"></div>
+                    </div>
+                    <button onclick="Aplicacion.guardarPrimerIngreso()" class="btn-moderno btn-exito w-100 mb-2 shadow-sm">Guardar y Entrar <i class="bi bi-check-circle-fill ms-1"></i></button>
+                    <button onclick="location.reload()" class="btn btn-link text-muted w-100 text-decoration-none">Cancelar</button>
+                </div>
+
+                <div id="paso-invitado" style="display:none;" class="animate__animated animate__fadeInUp">
+                    <h5 class="fw-bold mb-3 text-center text-primary">Registro de Visitante</h5>
+                    <input type="text" id="inv-nombre" class="input-moderno mb-3" placeholder="Nombre y Apellido">
+                    <input type="email" id="inv-correo" class="input-moderno mb-3" placeholder="Correo">
+                    <input type="text" id="inv-telefono" class="input-moderno mb-3" placeholder="Teléfono">
+                    <input type="text" id="inv-motivo" class="input-moderno mb-4" placeholder="Motivo">
+                    <button onclick="Aplicacion.enviarRegistroInvitado()" class="btn-moderno btn-primario w-100 mb-2 shadow-sm">Ingresar como Invitado <i class="bi bi-box-arrow-in-right"></i></button>
+                    <button onclick="location.reload()" class="btn btn-link text-muted w-100 text-decoration-none">Volver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="vista-app" style="display: none;">
+        <aside id="menu-lateral" class="glass-sidebar shadow-lg">
+            <div class="sidebar-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center" onclick="Enrutador.navegar('Inicio')" style="cursor: pointer;">
+                    <img src="assets/img/logo.png" width="40" class="me-2 logo-img">
+                    <span class="fw-bold texto-gradiente sidebar-texto">SIGAE UE L.B.</span>
+                </div>
+                <button class="btn-colapsar d-none d-lg-block ms-auto" onclick="Aplicacion.alternarMenu()"><i class="bi bi-list"></i></button>
+            </div>
+            <div id="contenedor-enlaces" class="sidebar-menu pb-5"></div>
+        </aside>
+        
+        <main id="contenido-principal">
+            <header class="glass-header shadow-sm d-flex align-items-center px-4">
+                <button class="btn-movil d-lg-none me-3" onclick="Aplicacion.alternarMenuMovil()"><i class="bi bi-list fs-3"></i></button>
+                <h5 id="titulo-pagina" class="mb-0 fw-bold text-dark d-none d-md-block">Cargando...</h5>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="usuario-info me-3 text-end d-none d-md-block">
+                        <div id="nombre-usuario-nav" class="fw-bold text-dark">Usuario</div>
+                        <div id="rol-usuario-nav" class="small texto-gradiente fw-bold">Rol</div>
+                    </div>
+                    <button onclick="Aplicacion.cerrarSesion()" class="btn-circulo btn-peligro shadow-sm" title="Cerrar Sesión"><i class="bi bi-power"></i></button>
+                </div>
+            </header>
+            
+            <div id="area-dinamica" class="contenedor-dinamico p-4 p-md-5"></div>
+            
+            <footer class="w-100 d-flex flex-column align-items-center py-4 mt-auto border-top bg-light bg-opacity-50">
+                <div class="d-flex justify-content-center align-items-center gap-4 mb-3">
+                    <img src="assets/img/logoMPPE.png" alt="MPPE" height="40" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+                    <img src="assets/img/logo.png" alt="Escuela" height="40" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+                </div>
+                <div class="fw-bold text-center mb-2" style="color: #64748b; font-size: 0.85rem; letter-spacing: 0.5px;">
+                    Escuelas DEP Oriente <span id="anio-actual-footer"></span> <span class="mx-2">|</span> <span class="text-primary">Versión 1.0</span>
+                </div>
+                <div class="text-center mt-2 p-2 rounded-3 bg-white border shadow-sm" style="font-size: 0.75rem; color: #475569; max-width: 400px;">
+                    <div class="fw-bold mb-1 text-dark"><i class="bi bi-badge-cc-fill fs-6 align-middle me-1"></i> CC BY-SA 3.0 VE</div>
+                    Atribución-CompartirIgual 3.0 Venezuela
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script src="js/nucleo/configuracion.js"></script>
+    <script src="js/nucleo/enrutador.js"></script>
+    <script src="js/nucleo/aplicacion.js"></script>
+    
+    <script src="js/modulos/mod_inicio.js"></script>
+    <script src="js/modulos/mod_escuela.js"></script>
+    <script src="js/modulos/mod_transporte.js"></script>
+    <script src="js/modulos/mod_docentes.js"></script>
+    <script src="js/modulos/mod_seguridad.js"></script>
+    
+    <script>
+        document.getElementById('anio-actual-footer').textContent = new Date().getFullYear();
+        window.addEventListener('error', function(e) {
+            console.error("Error JS detectado. Protegiendo interfaz...");
+            const loader = document.getElementById('pantalla-carga');
+            const login = document.getElementById('vista-login');
+            if(loader) loader.style.display = 'none';
+            if(login && !localStorage.getItem('sigae_usuario')) login.style.display = 'flex';
+        });
+
+        // ===============================================
+        // REGISTRO DEL SERVICE WORKER (Para instalar PWA)
+        // ===============================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registrado con éxito con alcance: ', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Fallo en el registro del ServiceWorker: ', error);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

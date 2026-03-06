@@ -1,0 +1,73 @@
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+            
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-8 text-center text-md-start mb-4 mb-md-0">
+                    <span class="badge bg-white text-primary mb-2 shadow-sm" style="font-weight: 800; letter-spacing: 1px;"><i class="bi bi-person-badge me-1"></i> SEGURIDAD</span>
+                    <h2 class="fw-bolder mb-2 text-white" style="font-size: 2.2rem;">Mi Perfil</h2>
+                    <p class="mb-0 text-white-50 fw-bold fs-5">Visualiza y actualiza tu información de contacto y contraseñas.</p>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <div class="fondo-logo-blanco">
+                        <img src="assets/img/logo.png" alt="Logo" class="img-fluid logo-animado-banner" style="max-height: 100px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center animate__animated animate__fadeInUp">
+    <div class="col-12 col-xl-10">
+        <div class="tarjeta-modulo p-4 p-md-5 bg-white border-top border-5 border-primary shadow-sm">
+            
+            <div class="d-flex flex-column flex-md-row align-items-center mb-5 pb-4 border-bottom">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center mb-3 mb-md-0 me-md-4 fw-bold border border-primary shadow-sm" style="width: 100px; height: 100px; font-size: 3rem;" id="perfil-avatar">?</div>
+                <div class="text-center text-md-start">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-2">
+                        <span class="badge bg-light text-dark border px-3 py-2 me-2 shadow-sm" id="perfil-rol"><i class="bi bi-shield-check text-primary"></i> Rol</span>
+                        <span class="badge bg-success px-3 py-2 shadow-sm" id="perfil-estado">Activo</span>
+                    </div>
+                    <div class="text-muted fw-bold">Cédula: <span id="perfil-cedula" class="text-dark">Cargando...</span></div>
+                </div>
+            </div>
+
+            <div class="row g-5">
+                <div class="col-md-6">
+                    <h5 class="fw-bold text-dark mb-4"><i class="bi bi-person-lines-fill text-primary me-2"></i> Datos de Contacto</h5>
+                    <label class="small fw-bold text-muted mb-1">Nombre Completo <i class="bi bi-pencil-fill text-primary ms-1"></i></label>
+                    <input type="text" id="perfil-nombre-input" class="input-moderno mb-3" placeholder="Tu Nombre">
+                    <label class="small fw-bold text-muted mb-1">Correo Electrónico <i class="bi bi-pencil-fill text-primary ms-1"></i></label>
+                    <input type="email" id="perfil-email" class="input-moderno mb-3" placeholder="ejemplo@correo.com">
+                    <label class="small fw-bold text-muted mb-1">Teléfono <i class="bi bi-pencil-fill text-primary ms-1"></i></label>
+                    <input type="text" id="perfil-telefono" class="input-moderno mb-4" placeholder="0414-0000000">
+
+                    <h5 class="fw-bold text-dark mb-4 mt-2"><i class="bi bi-key-fill text-warning me-2"></i> Cambiar Contraseña</h5>
+                    <div class="alert alert-light border small text-muted mb-3"><i class="bi bi-info-circle text-primary"></i> Déjalo en blanco si no deseas cambiar tu contraseña.</div>
+                    <input type="password" id="perfil-clave-actual" class="input-moderno mb-2" placeholder="Contraseña Actual">
+                    <input type="password" id="perfil-clave-nueva" class="input-moderno mb-2" placeholder="Nueva Contraseña">
+                    <input type="password" id="perfil-clave-confirmar" class="input-moderno mb-3" placeholder="Repetir Nueva Contraseña">
+                </div>
+
+                <div class="col-md-6 border-start-md">
+                    <h5 class="fw-bold text-dark mb-4"><i class="bi bi-shield-lock-fill text-danger me-2"></i> Preguntas de Seguridad</h5>
+                    <div class="alert alert-light border small text-muted mb-3"><i class="bi bi-info-circle text-primary"></i> Llénalas solo si deseas actualizar tus preguntas actuales.</div>
+                    <label class="small fw-bold text-muted mb-1">Nueva Pregunta 1</label>
+                    <select id="perfil-preg1" class="input-moderno mb-2 text-muted"><option value="" disabled selected>-- Cargando opciones... --</option></select>
+                    <input type="text" id="perfil-resp1" class="input-moderno mb-4" placeholder="Escribe la respuesta 1">
+                    <label class="small fw-bold text-muted mb-1">Nueva Pregunta 2</label>
+                    <select id="perfil-preg2" class="input-moderno mb-2 text-muted"><option value="" disabled selected>-- Cargando opciones... --</option></select>
+                    <input type="text" id="perfil-resp2" class="input-moderno mb-3" placeholder="Escribe la respuesta 2">
+                </div>
+            </div>
+
+            <div class="text-center mt-5 pt-4 border-top">
+                <button onclick="ModSeguridad.guardarMiPerfil()" class="btn-moderno btn-primario px-5 py-3 shadow fs-5"><i class="bi bi-save2-fill me-2"></i> Guardar Todos los Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
