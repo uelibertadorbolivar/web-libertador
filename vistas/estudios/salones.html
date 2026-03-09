@@ -1,0 +1,146 @@
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white" style="background: linear-gradient(135deg, #00C3FF 0%, #1e3a8a 100%); border-radius: 16px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div><div class="burbuja-3d burbuja-2"></div>
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-8 text-center text-md-start">
+                    <span class="badge bg-white text-info mb-2 shadow-sm" style="font-weight: 800; letter-spacing: 1px;">
+                        <i class="bi bi-grid-3x3-gap-fill me-1"></i> CONTROL DE ESTUDIOS
+                    </span>
+                    <h2 class="fw-bolder mb-2 text-white" style="font-size: 2.2rem;">Grados y Salones</h2>
+                    <p class="mb-0 text-white-50 fw-bold fs-5">Registra grupos, secciones y apertura los salones de clases.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4 animate__animated animate__fadeInUp">
+    <div class="col-12">
+        <ul class="nav nav-pills nav-fill bg-white p-2 rounded-pill shadow-sm border">
+            <li class="nav-item">
+                <button class="nav-link active fw-bold rounded-pill" id="tab-grados" onclick="window.ModSalones.cambiarTab('Grados')">
+                    <i class="bi bi-layers-fill me-2"></i>1. Grupos / Grados / Años
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold rounded-pill text-secondary" id="tab-secciones" onclick="window.ModSalones.cambiarTab('Secciones')">
+                    <i class="bi bi-alphabet me-2"></i>2. Secciones
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold rounded-pill text-secondary" id="tab-salones" onclick="window.ModSalones.cambiarTab('Salones')">
+                    <i class="bi bi-door-open-fill me-2"></i>3. Apertura de Salones
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div id="vista-grados" class="row g-4 animate__animated animate__fadeInUp">
+    <div class="col-12 col-xl-4">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-primary">
+            <h5 class="fw-bold text-dark mb-4" id="titulo-form-grado"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Añadir Grado / Año</h5>
+            
+            <label class="small fw-bold text-muted mb-1">Nombre del Grupo, Grado o Año</label>
+            <input type="text" id="txt-grado" class="input-moderno mb-4" placeholder="Ej: 1er Grado, 2do Año, Maternal">
+            
+            <button class="btn-moderno btn-primario w-100 shadow-sm mb-2" id="btn-guardar-grado" onclick="window.ModSalones.guardarConfiguracion('Grado_Anio', 'txt-grado')">
+                <i class="bi bi-save-fill me-2"></i>Registrar Grado
+            </button>
+            <button class="btn btn-light w-100 border text-secondary shadow-sm d-none" id="btn-cancelar-grado" onclick="window.ModSalones.cancelarEdicionGrado()">
+                <i class="bi bi-x-circle me-2"></i>Cancelar Edición
+            </button>
+        </div>
+    </div>
+    <div class="col-12 col-xl-8">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-info">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-list-ul text-info me-2"></i>Catálogo de Grados y Años</h5>
+            <div class="table-responsive rounded-3 border">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light"><tr><th class="py-3 ps-3">Nombre Registrado</th><th class="text-end pe-3" style="width: 25%;">Acción</th></tr></thead>
+                    <tbody id="tabla-grados"><tr><td colspan="2" class="text-center py-4 text-muted">Cargando...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="vista-secciones" class="row g-4 animate__animated animate__fadeInUp d-none">
+    <div class="col-12 col-xl-4">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-primary">
+            <h5 class="fw-bold text-dark mb-4" id="titulo-form-seccion"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Añadir Sección</h5>
+            
+            <label class="small fw-bold text-muted mb-1">Identificador de la Sección</label>
+            <input type="text" id="txt-seccion" class="input-moderno mb-4" placeholder="Ej: A, B, C, Única">
+            
+            <button class="btn-moderno btn-primario w-100 shadow-sm mb-2" id="btn-guardar-seccion" onclick="window.ModSalones.guardarConfiguracion('Seccion', 'txt-seccion')">
+                <i class="bi bi-save-fill me-2"></i>Registrar Sección
+            </button>
+            <button class="btn btn-light w-100 border text-secondary shadow-sm d-none" id="btn-cancelar-seccion" onclick="window.ModSalones.cancelarEdicionSeccion()">
+                <i class="bi bi-x-circle me-2"></i>Cancelar Edición
+            </button>
+        </div>
+    </div>
+    <div class="col-12 col-xl-8">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-info">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-list-ul text-info me-2"></i>Catálogo de Secciones</h5>
+            <div class="table-responsive rounded-3 border">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light"><tr><th class="py-3 ps-3">Sección Registrada</th><th class="text-end pe-3" style="width: 25%;">Acción</th></tr></thead>
+                    <tbody id="tabla-secciones"><tr><td colspan="2" class="text-center py-4 text-muted">Cargando...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="vista-salones" class="row g-4 animate__animated animate__fadeInUp d-none">
+    <div class="col-12 col-xl-4">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-success">
+            <h5 class="fw-bold text-dark mb-4" id="titulo-form-salon"><i class="bi bi-door-open text-success me-2"></i>Aperturar Nuevo Salón</h5>
+            
+            <label class="small fw-bold text-muted mb-1">1. Seleccione el Nivel Educativo</label>
+            <select id="sel-nivel" class="input-moderno mb-3" onchange="window.ModSalones.previsualizarNombre()"><option value="">-- Cargar Niveles --</option></select>
+
+            <label class="small fw-bold text-muted mb-1">2. Seleccione el Grado o Año</label>
+            <select id="sel-grado" class="input-moderno mb-3" onchange="window.ModSalones.previsualizarNombre()"><option value="">-- Cargar Grados --</option></select>
+
+            <label class="small fw-bold text-muted mb-1">3. Asigne la Sección</label>
+            <select id="sel-seccion" class="input-moderno mb-4" onchange="window.ModSalones.previsualizarNombre()"><option value="">-- Cargar Secciones --</option></select>
+
+            <div class="bg-light p-3 rounded-3 text-center border mb-4">
+                <small class="text-muted d-block mb-1">Previsualización del Salón:</small>
+                <div id="lbl-preview-salon" class="fw-bold text-primary" style="font-size: 1.1rem; line-height: 1.2;">Seleccione las opciones...</div>
+            </div>
+
+            <button class="btn-moderno btn-exito w-100 shadow-sm mb-2" id="btn-guardar-salon" onclick="window.ModSalones.guardarSalon()">
+                <i class="bi bi-check-circle-fill me-2"></i>Aperturar Salón
+            </button>
+            <button class="btn btn-light w-100 border text-secondary shadow-sm d-none" id="btn-cancelar-salon" onclick="window.ModSalones.cancelarEdicionSalon()">
+                <i class="bi bi-x-circle me-2"></i>Cancelar Edición
+            </button>
+        </div>
+    </div>
+    <div class="col-12 col-xl-8">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-warning">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-building-check text-warning me-2"></i>Salones Activos</h5>
+            <div class="table-responsive rounded-3 border">
+                <table class="table table-hover align-middle mb-0 text-center">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="py-3 text-start ps-3">Nombre Oficial del Salón</th>
+                            <th class="py-3">Nivel</th>
+                            <th class="py-3">Grado/Año</th>
+                            <th class="py-3">Sección</th>
+                            <th class="py-3 text-end pe-3" style="width: 20%;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-salones">
+                        <tr><td colspan="5" class="py-5 text-muted">Cargando salones...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

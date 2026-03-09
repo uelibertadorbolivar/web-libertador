@@ -1,0 +1,113 @@
+<style>
+/* Estilos para embellecer el Organigrama de Google */
+.google-visualization-orgchart-node { 
+    border: none !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; cursor: pointer;
+}
+.google-visualization-orgchart-lineleft, .google-visualization-orgchart-lineright, .google-visualization-orgchart-linebottom { 
+    border-color: #0066FF !important; border-width: 2px !important; 
+}
+/* REPARACIÓN DEL CORTE IZQUIERDO: Asegura el centrado sin romper el scroll */
+.google-visualization-orgchart-table {
+    margin: 0 auto !important;
+}
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white" style="background: linear-gradient(135deg, #455A64 0%, #1e293b 100%); border-radius: 16px; position: relative; overflow: hidden;">
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-8 text-center text-md-start">
+                    <span class="badge bg-white text-dark mb-2 shadow-sm" style="font-weight: 800; letter-spacing: 1px;">
+                        <i class="bi bi-diagram-2 me-1"></i> ESTRUCTURA ORGANIZATIVA
+                    </span>
+                    <h2 class="fw-bolder mb-2 text-white" style="font-size: 2.2rem;">Cadena Supervisoria</h2>
+                    <p class="mb-0 text-white-50 fw-bold fs-5">Establece quién supervisa a quién y visualiza el organigrama.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4 animate__animated animate__fadeInUp">
+    <div class="col-12">
+        <ul class="nav nav-pills nav-fill bg-white p-2 rounded-pill shadow-sm border" id="pestañas-jerarquia">
+            <li class="nav-item">
+                <button class="nav-link active fw-bold rounded-pill" id="tab-asignar" onclick="window.ModJerarquia.cambiarTab('Asignar')">
+                    <i class="bi bi-link-45deg me-2"></i>Definir Dependencias
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link fw-bold rounded-pill text-secondary" id="tab-organigrama" onclick="window.ModJerarquia.cambiarTab('Organigrama')">
+                    <i class="bi bi-diagram-3-fill me-2"></i>Ver Organigrama
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div id="vista-asignar" class="row g-4 animate__animated animate__fadeInUp">
+    <div class="col-12 col-xl-5">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5" style="border-color: #0066FF;">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-person-up text-primary me-2"></i>1. Seleccionar Supervisor</h5>
+            <p class="text-muted small mb-3">Elige el cargo que actuará como supervisor o jefe de otras áreas.</p>
+            
+            <select id="sel-supervisor" class="input-moderno mb-3" onchange="window.ModJerarquia.cargarSubordinados()">
+                <option value="">-- Seleccione el Cargo --</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-7">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5" style="border-color: #10b981;">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-diagram-2 text-success me-2"></i>2. Cargos Supervisados</h5>
+            <p class="text-muted small mb-3">Marca los cargos que están subordinados o responden directamente al supervisor seleccionado.</p>
+            
+            <div id="mensaje-seleccione" class="text-center py-5 text-muted">
+                <i class="bi bi-arrow-left-circle fs-1 d-block mb-2"></i>
+                Selecciona un supervisor a la izquierda.
+            </div>
+
+            <div id="panel-subordinados" class="d-none">
+                <div class="bg-light p-3 rounded-3 border mb-4" id="lista-subordinados" style="max-height: 400px; overflow-y: auto;">
+                    </div>
+                
+                <button class="btn-moderno btn-primario w-100 shadow-sm" onclick="window.ModJerarquia.guardarJerarquia()">
+                    <i class="bi bi-cloud-check-fill me-2"></i>Guardar Cadena Supervisoria
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="vista-organigrama" class="row g-4 animate__animated animate__fadeInUp d-none">
+    <div class="col-12">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm border-top border-5" style="border-color: #FF8D00;">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <select id="filtro-organigrama" class="input-moderno w-auto shadow-sm" onchange="window.ModJerarquia.dibujarOrganigrama()">
+                        <option value="">Vista General (Todos)</option>
+                    </select>
+                    
+                    <div class="form-check form-switch fs-5">
+                        <input class="form-check-input shadow-sm" type="checkbox" id="chk-nombres" onchange="window.ModJerarquia.dibujarOrganigrama()">
+                        <label class="form-check-label text-muted small fw-bold" style="font-size: 0.9rem; padding-top:4px;" for="chk-nombres">Mostrar Nombres</label>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary fw-bold shadow-sm" onclick="window.ModJerarquia.dibujarOrganigrama()">
+                        <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-md-inline ms-1">Actualizar</span>
+                    </button>
+                    <button class="btn btn-danger fw-bold shadow-sm" onclick="window.ModJerarquia.imprimirPDF()">
+                        <i class="bi bi-file-earmark-pdf-fill"></i> <span class="d-none d-md-inline ms-1">Exportar PDF</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="chart_div" class="w-100 bg-white border rounded-3 p-4 shadow-inner text-center" style="min-height: 500px; overflow: auto; position: relative;">
+                </div>
+
+        </div>
+    </div>
+</div>
