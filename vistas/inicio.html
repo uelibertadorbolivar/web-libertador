@@ -1,0 +1,158 @@
+<style>
+    /* Efectos hover premium para las tarjetas de inicio */
+    .tarjeta-inicio {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .tarjeta-inicio:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 102, 255, 0.1) !important;
+        border-color: rgba(0, 102, 255, 0.2);
+    }
+    .icono-flotante {
+        transition: transform 0.3s ease;
+    }
+    .tarjeta-inicio:hover .icono-flotante {
+        transform: scale(1.15) rotate(5deg);
+    }
+    .btn-filosofia {
+        border-radius: 20px;
+        font-weight: bold;
+        transition: all 0.2s;
+    }
+    .btn-filosofia.activo {
+        background-color: var(--color-primario);
+        color: white;
+        box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+    }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white" style="background: linear-gradient(135deg, #0066FF 0%, #00C3FF 100%); border-radius: 16px; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0,102,255,0.2);">
+            <div class="burbuja-3d burbuja-1" style="opacity: 0.6;"></div>
+            <div class="burbuja-3d burbuja-2" style="opacity: 0.4;"></div>
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-primary mb-2 shadow-sm px-3 py-2 rounded-pill" style="font-weight: 800; letter-spacing: 1px;">
+                        <i class="bi bi-stars me-1 text-warning"></i> SISTEMA SIGAE v1.0
+                    </span>
+                    <h1 class="fw-bolder mb-1 text-white" style="font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);" id="lbl-escuela-nombre">Unidad Educativa Libertador Bolívar</h1>
+                    <p class="mb-0 text-white-50 fw-bold fs-5">Panel de Control Principal | <span id="lbl-rol-actual" class="text-white"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+        <div class="tarjeta-inicio bg-white p-4 rounded-4 h-100 shadow-sm border-start border-primary border-4">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3 icono-flotante">
+                    <i class="bi bi-building-fill text-primary fs-3"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-0">Identificación</h4>
+            </div>
+            <div class="d-flex flex-column gap-3 text-muted">
+                <div class="d-flex align-items-center"><i class="bi bi-upc-scan fs-5 me-3 text-secondary"></i> <strong>RIF:</strong> <span id="lbl-escuela-rif" class="ms-2">Cargando...</span></div>
+                <div class="d-flex align-items-center"><i class="bi bi-hash fs-5 me-3 text-secondary"></i> <strong>DEA:</strong> <span id="lbl-escuela-dea" class="ms-2">Cargando...</span></div>
+                <div class="d-flex align-items-start"><i class="bi bi-geo-alt-fill fs-5 me-3 text-danger"></i> <div><strong>Dirección:</strong> <span id="lbl-escuela-dir" class="d-block mt-1 small">Cargando...</span></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+        <div class="tarjeta-inicio bg-white p-4 rounded-4 h-100 shadow-sm border-start border-info border-4">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle me-3 icono-flotante">
+                    <i class="bi bi-compass-fill text-info fs-3"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-0">Filosofía de Gestión</h4>
+            </div>
+            
+            <div class="d-flex gap-2 mb-3 border-bottom pb-3">
+                <button class="btn btn-sm btn-light btn-filosofia activo px-3" id="btn-fil-mision" onclick="window.ModInicio.verFilosofia('mision')">Misión</button>
+                <button class="btn btn-sm btn-light btn-filosofia px-3 text-muted" id="btn-fil-vision" onclick="window.ModInicio.verFilosofia('vision')">Visión</button>
+                <button class="btn btn-sm btn-light btn-filosofia px-3 text-muted" id="btn-fil-peic" onclick="window.ModInicio.verFilosofia('peic')">PEIC</button>
+            </div>
+            
+            <div id="txt-filosofia" class="text-muted" style="font-style: italic; min-height: 80px; font-size: 0.95rem; line-height: 1.6;">
+                Cargando información institucional...
+            </div>
+            
+            <input type="hidden" id="data-mision" value="">
+            <input type="hidden" id="data-vision" value="">
+            <input type="hidden" id="data-peic" value="">
+        </div>
+    </div>
+</div>
+
+<div id="panel-admin" class="row g-4 d-none animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+    <div class="col-12"><h5 class="fw-bold text-dark border-bottom pb-2"><i class="bi bi-speedometer2 me-2 text-warning"></i>Accesos Rápidos de Administración</h5></div>
+    
+    <div class="col-6 col-md-3">
+        <div class="tarjeta-inicio bg-white p-3 rounded-4 text-center shadow-sm cursor-pointer" onclick="Enrutador.navegar('Gestión de Usuarios')">
+            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-2 icono-flotante"><i class="bi bi-people-fill fs-3 text-primary"></i></div>
+            <h6 class="fw-bold mb-0 fs-6">Usuarios</h6>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="tarjeta-inicio bg-white p-3 rounded-4 text-center shadow-sm cursor-pointer" onclick="Enrutador.navegar('Calendario Escolar')">
+            <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex p-3 mb-2 icono-flotante"><i class="bi bi-calendar-event fs-3 text-danger"></i></div>
+            <h6 class="fw-bold mb-0 fs-6">Calendario</h6>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="tarjeta-inicio bg-white p-3 rounded-4 text-center shadow-sm cursor-pointer" onclick="Enrutador.navegar('Cargos Institucionales')">
+            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-3 mb-2 icono-flotante"><i class="bi bi-diagram-3-fill fs-3 text-success"></i></div>
+            <h6 class="fw-bold mb-0 fs-6">Cargos</h6>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="tarjeta-inicio bg-white p-3 rounded-4 text-center shadow-sm cursor-pointer" onclick="Enrutador.navegar('Configuración del Sistema')">
+            <div class="bg-dark bg-opacity-10 rounded-circle d-inline-flex p-3 mb-2 icono-flotante"><i class="bi bi-gear-fill fs-3 text-dark"></i></div>
+            <h6 class="fw-bold mb-0 fs-6">Ajustes</h6>
+        </div>
+    </div>
+</div>
+
+<div id="panel-docente" class="row g-4 d-none animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+    <div class="col-12"><h5 class="fw-bold text-dark border-bottom pb-2"><i class="bi bi-journal-bookmark-fill me-2 text-success"></i>Área de Trabajo Docente</h5></div>
+    
+    <div class="col-12 col-md-4">
+        <div class="tarjeta-inicio bg-white p-4 rounded-4 shadow-sm cursor-pointer d-flex align-items-center" onclick="Enrutador.navegar('Gestión Académica')">
+            <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3 icono-flotante"><i class="bi bi-book-half fs-3 text-success"></i></div>
+            <div><h6 class="fw-bold mb-0">Mis Asignaturas</h6><small class="text-muted">Cargas y planes</small></div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="tarjeta-inicio bg-white p-4 rounded-4 shadow-sm cursor-pointer d-flex align-items-center" onclick="Enrutador.navegar('Evaluación Educativa')">
+            <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3 icono-flotante"><i class="bi bi-clipboard-check fs-3 text-primary"></i></div>
+            <div><h6 class="fw-bold mb-0">Carga de Notas</h6><small class="text-muted">Evaluaciones</small></div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="tarjeta-inicio bg-white p-4 rounded-4 shadow-sm cursor-pointer d-flex align-items-center" onclick="Enrutador.navegar('Calendario Escolar')">
+            <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3 icono-flotante"><i class="bi bi-calendar-week fs-3 text-warning"></i></div>
+            <div><h6 class="fw-bold mb-0">Eventos</h6><small class="text-muted">Próximas actividades</small></div>
+        </div>
+    </div>
+</div>
+
+<div id="panel-estudiante" class="row g-4 d-none animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+    <div class="col-12"><h5 class="fw-bold text-dark border-bottom pb-2"><i class="bi bi-mortarboard-fill me-2 text-info"></i>Mi Área Académica</h5></div>
+    
+    <div class="col-12 col-md-6">
+        <div class="tarjeta-inicio bg-white p-4 rounded-4 shadow-sm cursor-pointer d-flex align-items-center" onclick="Enrutador.navegar('Notas y Boletines')">
+            <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3 icono-flotante"><i class="bi bi-file-earmark-text fs-2 text-info"></i></div>
+            <div><h5 class="fw-bold mb-1">Mis Calificaciones</h5><p class="text-muted small mb-0">Ver boletines y notas de evaluación</p></div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="tarjeta-inicio bg-white p-4 rounded-4 shadow-sm cursor-pointer d-flex align-items-center" onclick="Enrutador.navegar('Calendario Escolar')">
+            <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3 icono-flotante"><i class="bi bi-calendar3 fs-2 text-primary"></i></div>
+            <div><h5 class="fw-bold mb-1">Calendario Escolar</h5><p class="text-muted small mb-0">Días feriados y fechas de entregas</p></div>
+        </div>
+    </div>
+</div>
