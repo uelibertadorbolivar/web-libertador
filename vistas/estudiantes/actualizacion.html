@@ -1,0 +1,145 @@
+<style>
+    .wizard-steps { display: flex; justify-content: space-between; position: relative; margin-bottom: 2rem; }
+    .wizard-steps::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: #e2e8f0; z-index: 1; transform: translateY(-50%); border-radius: 2px; }
+    .wizard-step { position: relative; z-index: 2; background: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 4px solid #e2e8f0; color: #94a3b8; transition: all 0.3s; }
+    .wizard-step.activo { border-color: #8B5CF6; background: #8B5CF6; color: white; box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); transform: scale(1.1); }
+    .wizard-step.completado { border-color: #8B5CF6; background: white; color: #8B5CF6; }
+    .step-title { position: absolute; top: 55px; font-size: 0.75rem; text-align: center; width: 100px; left: -27px; color: #64748b; font-weight: 600; }
+    .wizard-panel { display: none; animation: fadeIn 0.4s; }
+    .wizard-panel.activo { display: block; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 text-white shadow-sm" style="background: linear-gradient(135deg, #8B5CF6 0%, #4C1D95 100%); border-radius: 20px;">
+            <div class="d-flex align-items-center">
+                <div class="bg-white bg-opacity-25 p-3 rounded-circle me-4"><i class="bi bi-arrow-repeat fs-1"></i></div>
+                <div>
+                    <h2 class="fw-bolder mb-1">Actualización de Datos</h2>
+                    <p class="mb-0 fs-6 text-white-50">Formulario integral para actualizar la ficha del estudiante.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animate__animated animate__fadeIn">
+    <div class="col-12 col-xl-10 mx-auto">
+        <div class="tarjeta-modulo bg-white p-4 p-md-5 shadow-sm rounded-4 border-top border-5" style="border-color: #8B5CF6;">
+            
+            <div class="wizard-steps px-3 mb-5 px-md-5" id="wizard-indicadores">
+                <div class="wizard-step activo" id="ind-1">1<div class="step-title">Identidad</div></div>
+                <div class="wizard-step" id="ind-2">2<div class="step-title">Salud y Físico</div></div>
+                <div class="wizard-step" id="ind-3">3<div class="step-title">Familia</div></div>
+                <div class="wizard-step" id="ind-4">4<div class="step-title">Corporativo</div></div>
+                <div class="wizard-step" id="ind-5">5<div class="step-title">Logística</div></div>
+                <div class="wizard-step" id="ind-6"><i class="bi bi-check-lg"></i><div class="step-title">Finalizar</div></div>
+            </div>
+
+            <form id="form-actualizacion" onsubmit="event.preventDefault();">
+                
+                <div class="wizard-panel activo" id="paso-1">
+                    <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-1-circle-fill me-2" style="color: #8B5CF6;"></i>Datos del Estudiante</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label small fw-bold text-primary">Código Único (Auto-generado)</label><input type="text" class="input-moderno border-primary text-primary fw-bold" id="est-codigo" readonly style="background-color: #f8f9fa;"></div>
+                        <div class="col-md-4"><label class="form-label small fw-bold">Nombres Completos</label><input type="text" class="input-moderno" id="est-nombres" placeholder="Ej: Juan Carlos"></div>
+                        <div class="col-md-4"><label class="form-label small fw-bold">Apellidos Completos</label><input type="text" class="input-moderno" id="est-apellidos" placeholder="Ej: Pérez Gómez"></div>
+                        <div class="col-md-4"><label class="form-label small fw-bold">Cédula Escolar / Identidad</label><input type="text" class="input-moderno" id="est-cedula" placeholder="Ej: 32456678"></div>
+                        <div class="col-md-4"><label class="form-label small fw-bold">Fecha de Nacimiento</label><input type="date" class="input-moderno" id="est-nacimiento"></div>
+                        <div class="col-md-4"><label class="form-label small fw-bold">Género</label><select class="input-moderno text-muted" id="est-genero"><option value="">Seleccione...</option><option value="Femenino">Femenino</option><option value="Masculino">Masculino</option></select></div>
+                        
+                        <div class="col-12 mt-4 mb-2"><h6 class="fw-bold border-bottom pb-2 text-muted">Lugar de Nacimiento / Origen</h6></div>
+                        
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Nacionalidad</label>
+                            <select class="input-moderno text-dark fw-bold border-secondary shadow-sm" id="est-nacionalidad" onchange="window.ModActualizacion.cambiarNacionalidad()">
+                                <option value="">Seleccione Nacionalidad...</option>
+                                <option value="Venezolana">Venezolana (V)</option>
+                                <option value="Extranjera">Extranjera (E)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-8" id="bloque-venezolano" style="display: none;">
+                            <div class="row g-2">
+                                <div class="col-md-4"><label class="form-label small fw-bold">Estado</label><select class="input-moderno text-muted" id="est-estado" onchange="window.ModActualizacion.cargarMunicipios()"><option value="">Seleccione...</option></select></div>
+                                <div class="col-md-4"><label class="form-label small fw-bold">Municipio</label><select class="input-moderno text-muted" id="est-municipio" onchange="window.ModActualizacion.cargarParroquias()" disabled><option value="">Estado primero...</option></select></div>
+                                <div class="col-md-4"><label class="form-label small fw-bold">Parroquia</label><select class="input-moderno text-muted" id="est-parroquia" disabled><option value="">Municipio primero...</option></select></div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8 animate__animated animate__fadeIn" id="bloque-extranjero" style="display: none;">
+                            <label class="form-label small fw-bold">Dirección de Origen (País, Ciudad, Localidad)</label>
+                            <input type="text" class="input-moderno" id="est-direccion-ext" placeholder="Ej: Colombia, Bogotá, Distrito Capital...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-2">
+                    <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-2-circle-fill me-2" style="color: #8B5CF6;"></i>Salud, Físico y Tecnología</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label small fw-bold">Talla de Franela</label><select class="input-moderno text-muted" id="est-talla-franela"><option value="">Seleccione...</option><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option>14</option><option>S</option><option>M</option><option>L</option></select></div>
+                        <div class="col-md-4"><label class="form-label small fw-bold">Talla de Pantalón</label><input type="number" class="input-moderno" id="est-talla-pantalon" placeholder="Ej: 12"></div>
+                        <div class="col-md-4"><label class="form-label small fw-bold">Talla de Calzado</label><input type="number" class="input-moderno" id="est-talla-zapato" placeholder="Ej: 35"></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">Estatura (Metros)</label><input type="number" step="0.01" class="input-moderno" id="est-estatura" placeholder="Ej: 1.20"></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">Peso (Kg)</label><input type="number" step="0.1" class="input-moderno" id="est-peso" placeholder="Ej: 30.5"></div>
+                        <div class="col-12"><label class="form-label small fw-bold">Condiciones Médicas / Alergias</label><input type="text" class="input-moderno" id="est-medico" placeholder="Indique si padece alguna condición o alergia (Opcional)"></div>
+                        <hr class="my-4">
+                        <div class="col-md-6"><label class="form-label small fw-bold">¿Posee Computadora en casa?</label><select class="input-moderno text-muted" id="est-pc"><option value="">Seleccione...</option><option>Canaima</option><option>PC de Escritorio</option><option>Laptop</option><option>Ninguna</option></select></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">¿Posee Conexión a Internet?</label><select class="input-moderno text-muted" id="est-internet"><option value="">Seleccione...</option><option>Sí</option><option>No</option></select></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-3">
+                    <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-3-circle-fill me-2" style="color: #8B5CF6;"></i>Núcleo Familiar</h4>
+                    <div class="alert bg-light border text-dark small"><i class="bi bi-info-circle-fill text-primary me-2"></i>Datos del Representante Legal ante la institución.</div>
+                    <div class="row g-3">
+                        <div class="col-md-8"><label class="form-label small fw-bold">Nombres y Apellidos del Representante</label><input type="text" class="input-moderno" id="rep-nombres"></div>
+                        <div class="col-md-4"><label class="form-label small fw-bold">Cédula del Representante</label><input type="text" class="input-moderno" id="rep-cedula"></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">Parentesco (Ej: Madre, Abuelo...)</label><select class="input-moderno text-muted" id="rep-parentesco"><option value="">Cargando lista...</option></select></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">Teléfono de Contacto</label><input type="text" class="input-moderno" id="rep-telefono"></div>
+                        <div class="col-12"><label class="form-label small fw-bold">Dirección Completa de Habitación</label><input type="text" class="input-moderno" id="rep-direccion" placeholder="Sector, Calle, Casa..."></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-4">
+                    <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-4-circle-fill me-2" style="color: #8B5CF6;"></i>Perfil Corporativo del Representante</h4>
+                    <div class="alert bg-light border text-dark small"><i class="bi bi-buildings-fill text-primary me-2"></i>Información vinculada a las bases de datos de la Empresa / PDVSA.</div>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label small fw-bold">Condición Laboral</label><select class="input-moderno text-muted" id="corp-condicion"><option value="">Cargando lista...</option></select></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">Tipo de Nómina</label><select class="input-moderno text-muted" id="corp-nomina"><option value="">Cargando lista...</option></select></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">Negocio / Filial</label><select class="input-moderno text-muted" id="corp-filial"><option value="">Cargando lista...</option></select></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold">Organización / Gerencia</label><select class="input-moderno text-muted" id="corp-gerencia"><option value="">Cargando lista...</option></select></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-5">
+                    <h4 class="fw-bold mb-4 text-dark"><i class="bi bi-5-circle-fill me-2" style="color: #8B5CF6;"></i>Transporte Escolar</h4>
+                    <div class="row g-3">
+                        <div class="col-12"><label class="form-label small fw-bold">Ruta de Transporte Asignada</label><select class="input-moderno text-muted" id="log-ruta" onchange="window.ModActualizacion.filtrarParadas()"><option value="">Seleccione una Ruta...</option></select></div>
+                        <div class="col-12"><label class="form-label small fw-bold">Parada Específica</label><select class="input-moderno text-muted" id="log-parada" disabled><option value="">Seleccione primero la ruta...</option></select></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-6">
+                    <div class="text-center mb-4">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;"><i class="bi bi-file-earmark-check-fill fs-1 text-success"></i></div>
+                        <h4 class="fw-bold text-dark">Confirmación de Actualización</h4>
+                        <p class="text-muted">Revise que todos los datos suministrados sean correctos antes de guardar.</p>
+                    </div>
+                    <div class="card bg-light border-0 rounded-4 p-4 mb-4">
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="legal-contrato" style="transform: scale(1.2); margin-top: 0.3rem;">
+                            <label class="form-check-label ms-2 small fw-bold text-dark" for="legal-contrato">Declaro que la información aportada es veraz y acepto los términos del Contrato Digital de actualización institucional.</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-5 pt-3 border-top">
+                    <button type="button" class="btn btn-light border fw-bold text-muted px-4 shadow-sm hover-efecto" id="btn-prev" onclick="window.ModActualizacion.cambiarPaso(-1)" style="display: none;"><i class="bi bi-arrow-left me-2"></i> Atrás</button>
+                    <button type="button" class="btn btn-primary fw-bold px-5 shadow-sm hover-efecto ms-auto" style="background: #8B5CF6; border-color: #8B5CF6;" id="btn-next" onclick="window.ModActualizacion.cambiarPaso(1)">Siguiente <i class="bi bi-arrow-right ms-2"></i></button>
+                    <button type="button" class="btn btn-success fw-bold px-5 shadow-sm hover-efecto ms-auto" id="btn-save" onclick="window.ModActualizacion.guardarActualizacion()" style="display: none;"><i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar Datos</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

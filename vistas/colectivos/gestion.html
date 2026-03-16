@@ -1,0 +1,133 @@
+<style>
+    .tarjeta-btn { background: white; border-radius: 16px; border: 2px solid transparent; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; overflow: hidden; }
+    .tarjeta-btn:hover { transform: translateY(-8px); border-bottom-color: #e11d48; box-shadow: 0 15px 35px rgba(225, 29, 72, 0.15) !important; }
+    
+    /* ✨ ESFERAS DE CRISTAL 3D ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+</style>
+
+<div class="row mb-5 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white mb-3 px-3 py-2 shadow-sm fw-bold" style="color: #9f1239; letter-spacing: 1px; font-size: 0.85rem;">
+                        <i class="bi bi-diagram-3-fill me-1"></i> ORGANIZACIÓN ESCOLAR
+                    </span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Colectivos Educativos</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Gestión de coordinaciones, brigadas y sus integrantes.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="colectivos-dashboard" class="row g-4 animate__animated animate__fadeIn justify-content-center"></div>
+
+<div class="row mb-3 d-none animate__animated" id="btn-volver-dashboard">
+    <div class="col-12 text-center text-md-start">
+        <button class="btn btn-white shadow-sm fw-bold border rounded-pill px-4 hover-efecto" style="color: #e11d48;" onclick="window.ModColectivos.volverDashboard()">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Menú
+        </button>
+    </div>
+</div>
+
+<div id="vista-directorio" class="row g-4 animate__animated d-none">
+    <div class="col-12 col-xl-4">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-danger" style="border-radius: 20px;">
+            <h5 class="fw-bold text-dark mb-4" id="titulo-form-colectivo"><i class="bi bi-bookmark-plus text-danger me-2"></i>Crear Colectivo</h5>
+            <div id="form-colectivo-area">
+                <label class="fw-bold text-muted small mb-2">Clasificación</label>
+                <select id="col-tipo" class="form-select input-moderno mb-3 bg-light fw-bold text-dark">
+                    <option value="Colectivo">Colectivo Institucional</option>
+                    <option value="Coordinación">Coordinación</option>
+                    <option value="Brigada">Brigada Estudiantil / Docente</option>
+                    <option value="Comité">Comité</option>
+                </select>
+                
+                <label class="fw-bold text-muted small mb-2">Nombre de la Organización</label>
+                <input type="text" id="col-nombre" class="input-moderno mb-3" placeholder="Ej: Colectivo de Formación Docente">
+                
+                <label class="fw-bold text-muted small mb-2">Propósito / Descripción</label>
+                <textarea id="col-desc" class="form-control mb-4" rows="3" style="border-radius: 12px;"></textarea>
+                
+                <button class="btn-moderno w-100 shadow-sm text-white" style="background-color: #e11d48;" id="btn-guardar-colectivo" onclick="window.ModColectivos.guardarColectivo()">Guardar Registro</button>
+                <button class="btn btn-light w-100 mt-2 border d-none" id="btn-cancelar-colectivo" onclick="window.ModColectivos.cancelarEdicion()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-8">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-dark" style="border-radius: 20px;">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-collection text-dark me-2"></i>Organizaciones Registradas</h5>
+            <div class="table-responsive border rounded-4">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light"><tr><th class="ps-3">Tipo</th><th>Nombre</th><th>Propósito</th><th class="text-end pe-3" style="min-width: 140px;">Acción</th></tr></thead>
+                    <tbody id="tabla-colectivos"><tr><td colspan="4" class="text-center py-5 text-muted">Cargando...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="vista-asignacion" class="row animate__animated d-none">
+    <div class="col-12 col-md-10 mx-auto">
+        <div class="tarjeta-modulo p-4 p-md-5 bg-white shadow-sm border-top border-5 border-primary" style="border-radius: 20px;">
+            <h4 class="fw-bold text-dark mb-4 border-bottom pb-3"><i class="bi bi-people-fill text-primary me-2"></i>Conformación de Colectivo</h4>
+            
+            <div class="row g-4">
+                <div class="col-12">
+                    <label class="fw-bold text-muted small mb-2">Seleccione el Colectivo o Coordinación a conformar:</label>
+                    <select id="asig-colectivo" class="form-select input-moderno bg-light fw-bold text-primary" onchange="window.ModColectivos.cargarMiembrosActuales()">
+                        <option value="">Seleccione...</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="fw-bold text-danger small mb-2"><i class="bi bi-person-badge me-1"></i> Docente Asesor / Coordinador</label>
+                    <select id="asig-asesor" class="form-select input-moderno border-danger">
+                        <option value="">Seleccione personal...</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="fw-bold text-warning small mb-2"><i class="bi bi-megaphone-fill me-1"></i> Vocero Principal</label>
+                    <select id="asig-vocero" class="form-select input-moderno border-warning">
+                        <option value="">Seleccione personal...</option>
+                    </select>
+                </div>
+                
+                <div class="col-12">
+                    <label class="fw-bold text-success small mb-2"><i class="bi bi-people me-1"></i> Integrantes Adicionales</label>
+                    
+                    <div class="input-group mb-2 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                        <select id="asig-select-integrante" class="form-select bg-light border-success border-end-0" style="padding: 12px;">
+                            <option value="">Seleccione personal para añadir a la lista...</option>
+                        </select>
+                        <button class="btn btn-success fw-bold px-4" onclick="window.ModColectivos.agregarIntegrante()">
+                            <i class="bi bi-plus-lg me-1"></i> Añadir
+                        </button>
+                    </div>
+                    
+                    <p class="text-muted small mb-2" style="font-size: 0.75rem;">Puede añadir mediante el botón superior o escribiendo separados por coma (,)</p>
+                    <textarea id="asig-integrantes" class="form-control" rows="3" style="border-radius: 12px; border: 2px solid #bbf7d0;" placeholder="Ej: María Pérez, Carlos López, José González..."></textarea>
+                </div>
+                
+                <div class="col-12 pt-3 text-end">
+                    <button class="btn-moderno btn-primario px-5 shadow-sm fw-bold w-100" onclick="window.ModColectivos.guardarMiembros()">
+                        <i class="bi bi-diagram-3-fill me-2"></i>Guardar Estructura del Colectivo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
