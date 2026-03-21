@@ -55,7 +55,6 @@
             overflow: hidden;
             width: 100%;
             max-width: 950px;
-            /* La altura mínima fija se eliminó en móvil para evitar que se estire sin sentido */
         }
         @media (min-width: 768px) { 
             .tarjeta-split { flex-direction: row; min-height: 550px; } 
@@ -65,14 +64,14 @@
         .panel-color {
             position: relative;
             flex: 1;
-            padding: 2.5rem 1.5rem; /* Menos margen en celular */
+            padding: 2.5rem 1.5rem;
             color: white;
             overflow: hidden;
             background: #0066FF;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            text-align: center; /* Centrado en celular */
+            text-align: center;
         }
         @media (min-width: 768px) {
             .panel-color { padding: 3rem; text-align: left; }
@@ -92,7 +91,7 @@
 
         .panel-contenido-z { position: relative; z-index: 10; }
 
-        /* Efecto del logo (más pequeño en celulares) */
+        /* Efecto del logo */
         .logo-login-container { position: relative; display: inline-block; margin-bottom: 1rem; }
         .logo-login-animado { width: 60px; animation: levitarBrillar 4s ease-in-out infinite; }
         @media (min-width: 768px) { .logo-login-animado { width: 80px; margin-bottom: 1.5rem; } }
@@ -112,7 +111,7 @@
             50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
         }
 
-        /* Textos Responsivos para que entren bien en móvil */
+        /* Textos Responsivos */
         .panel-color h2 { font-weight: 800; font-size: 1.4rem; margin-bottom: 0.2rem; text-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.2;}
         .panel-color h3 { font-size: 0.85rem; font-weight: 400; margin-bottom: 1.5rem; opacity: 0.9; }
         .panel-color h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; text-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -125,10 +124,10 @@
             .panel-color p { font-size: 1rem; line-height: 1.5; }
         }
 
-        /* PANEL DERECHO: FORMULARIO (Márgenes arreglados) */
+        /* PANEL DERECHO: FORMULARIO */
         .panel-form {
             flex: 1.2;
-            padding: 2rem 1.5rem; /* Padding reducido en celular */
+            padding: 2rem 1.5rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -141,7 +140,7 @@
         
         .input-pill {
             border-radius: 50px !important;
-            padding: 12px 20px !important; /* Más compacto en móvil */
+            padding: 12px 20px !important;
             border: 2px solid #e2e8f0;
             font-size: 0.95rem;
             background: #f8fafc;
@@ -152,7 +151,7 @@
         
         .btn-pill {
             border-radius: 50px !important;
-            padding: 12px 20px !important; /* Más compacto en móvil */
+            padding: 12px 20px !important;
             font-weight: 700;
             font-size: 1rem;
             transition: all 0.3s ease;
@@ -280,7 +279,33 @@
                         </div>
                         
                         <div id="paso-primer-ingreso" style="display:none;" class="animate__animated animate__fadeInUp">
-                             </div>
+                            <h4 class="mb-3 text-primary">Configuración Inicial</h4>
+                            <p class="small text-muted mb-4">Hola <span id="lbl-pi-nombre" class="fw-bold text-dark"></span>, por ser tu primer ingreso debes configurar tu cuenta.</p>
+                            
+                            <input type="hidden" id="pi-nombre">
+                            
+                            <div class="position-relative mb-3">
+                                <input type="password" id="pi-clave1" class="form-control input-pill pe-5" placeholder="Crea tu contraseña">
+                                <button class="btn border-0 position-absolute end-0 top-50 translate-middle-y me-2" onclick="window.Aplicacion.alternarClave('pi-clave1')"><i class="bi bi-eye text-muted"></i></button>
+                            </div>
+                            <div class="position-relative mb-3">
+                                <input type="password" id="pi-clave2" class="form-control input-pill pe-5" placeholder="Confirma tu contraseña">
+                                <button class="btn border-0 position-absolute end-0 top-50 translate-middle-y me-2" onclick="window.Aplicacion.alternarClave('pi-clave2')"><i class="bi bi-eye text-muted"></i></button>
+                            </div>
+                            
+                            <input type="email" id="pi-email" class="form-control input-pill mb-3" placeholder="Correo Electrónico (Opcional)">
+                            <input type="text" id="pi-telefono" class="form-control input-pill mb-3" placeholder="Teléfono Celular (Opcional)">
+                            
+                            <label class="small text-muted fw-bold ps-2 mb-1">Preguntas de Seguridad (Para recuperar clave)</label>
+                            <select id="pi-preg1" class="form-select input-pill mb-2"></select>
+                            <input type="text" id="pi-resp1" class="form-control input-pill mb-3" placeholder="Respuesta 1">
+                            
+                            <select id="pi-preg2" class="form-select input-pill mb-2"></select>
+                            <input type="text" id="pi-resp2" class="form-control input-pill mb-4" placeholder="Respuesta 2">
+                            
+                            <button onclick="window.Aplicacion.procesarPrimerIngreso()" class="btn btn-primary w-100 btn-pill mb-3">Completar Registro</button>
+                            <button onclick="location.reload()" class="btn btn-outline-secondary w-100 btn-pill">Cancelar</button>
+                        </div>
 
                         <div id="paso-invitado" style="display:none;" class="animate__animated animate__fadeInUp">
                             <h4>Visitante</h4>
