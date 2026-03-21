@@ -67,7 +67,6 @@ window.Aplicacion = {
     temporizadorCierre: null,
     diferenciaTiempoMs: 0,
 
-    // ✨ CORRECCIÓN: El sistema AHORA ESPERA la hora de internet antes de arrancar ✨
     init: async function() { 
         await this.sincronizarRelojInternet(); 
         
@@ -87,7 +86,6 @@ window.Aplicacion = {
         } 
     },
 
-    // ✨ CORRECCIÓN: Función asíncrona segura con TimeAPI y Plan B (GitHub) ✨
     sincronizarRelojInternet: async function() {
         try {
             const r = await fetch('https://timeapi.io/api/Time/current/zone?timeZone=America/Caracas', { cache: 'no-store' });
@@ -174,8 +172,73 @@ window.Aplicacion = {
         if(!this.permisosActuales || !this.permisosActuales[modulo]) return false;
         return this.permisosActuales[modulo][accion] === true;
     },
+
     verificarUsuario: function() { const c = document.getElementById('inputCedula').value; if(!c) return Swal.fire('Atención', 'Ingrese cédula.', 'warning'); this.mostrarCarga(); this.peticion({ action: "verificar_usuario", cedula: c }, (res) => { if(res && res.found) { if(res.requiere_configuracion) { document.getElementById('paso-cedula').style.display = 'none'; document.getElementById('pi-nombre').value = res.nombre; this.cargarPreguntasSeguridad(res.nombre); } else { this.ocultarCarga(); document.getElementById('lbl-nombre-login').innerText = res.nombre; document.getElementById('paso-cedula').style.display = 'none'; document.getElementById('paso-clave').style.display = 'block'; setTimeout(() => document.getElementById('inputClave').focus(), 100); } } else { this.ocultarCarga(); Swal.fire('No encontrado', 'Cédula no registrada.', 'error'); } }); },
     
+    // ✨ FUNCIONES DE PRIMER INGRESO AÑADIDAS ✨
+    cargarPreguntasSeguridad: function(nombreUsuario) {
+        this.peticion({ action: "get_security_questions" }, (res) => {
+            this.ocultarCarga();
+            if (res && res.status === "success") {
+                document.getElementById('paso-cedula').style.display = 'none';
+                document.getElementById('paso-primer-ingreso').style.display = 'block';
+                
+                let htmlSelect = '<option value="">Seleccione una pregunta...</option>';
+                let preguntas = res.preguntas || [];
+                if(preguntas.length === 0) {
+                    preguntas = ["¿Color favorito?", "¿Nombre de tu primera mascota?", "¿Ciudad donde nacieron tus padres?", "¿Cuál es tu comida favorita?"];
+                }
+                preguntas.forEach(p => { htmlSelect += `<option value="${p}">${p}</option>`; });
+                
+                let s1 = document.getElementById('pi-preg1'); if(s1) s1.innerHTML = htmlSelect;
+                let s2 = document.getElementById('pi-preg2'); if(s2) s2.innerHTML = htmlSelect;
+                
+                let lbl = document.getElementById('lbl-pi-nombre'); if(lbl) lbl.innerText = nombreUsuario;
+            } else {
+                Swal.fire('Error', 'No se pudieron cargar las preguntas de seguridad.', 'error');
+            }
+        });
+    },
+
+    procesarPrimerIngreso: function() {
+        const c = document.getElementById('inputCedula').value;
+        const p1 = document.getElementById('pi-clave1').value;
+        const p2 = document.getElementById('pi-clave2').value;
+        const email = document.getElementById('pi-email').value;
+        const tel = document.getElementById('pi-telefono').value;
+        const preg1 = document.getElementById('pi-preg1').value;
+        const resp1 = document.getElementById('pi-resp1').value;
+        const preg2 = document.getElementById('pi-preg2').value;
+        const resp2 = document.getElementById('pi-resp2').value;
+
+        if(!p1 || !p2 || !preg1 || !resp1 || !preg2 || !resp2) {
+            return Swal.fire('Datos Incompletos', 'Las contraseñas y las preguntas de seguridad son obligatorias.', 'warning');
+        }
+        if(p1 !== p2) return Swal.fire('Error', 'Las contraseñas no coinciden.', 'error');
+        if(preg1 === preg2) return Swal.fire('Error', 'Debe seleccionar dos preguntas de seguridad distintas.', 'error');
+        if(!/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.])[A-Za-z\d@$!%*?&#.]{8,}$/.test(p1)) {
+            return Swal.fire('Contraseña Débil', 'Mínimo 8 caracteres, 1 mayúscula, 1 número y 1 símbolo (@$!%*?&#.).', 'error');
+        }
+
+        this.mostrarCarga();
+        this.peticion({
+            action: 'primer_ingreso', cedula: c, nueva_clave: p1,
+            email: email, telefono: tel, preg_1: preg1, resp_1: resp1, preg_2: preg2, resp_2: resp2
+        }, (res) => {
+            this.ocultarCarga();
+            if(res && res.status === 'success') {
+                Swal.fire('¡Éxito!', 'Cuenta configurada correctamente. Ahora inicie sesión con su nueva contraseña.', 'success').then(() => {
+                    document.getElementById('paso-primer-ingreso').style.display = 'none';
+                    document.getElementById('lbl-nombre-login').innerText = document.getElementById('pi-nombre').value || document.getElementById('lbl-pi-nombre').innerText;
+                    document.getElementById('paso-clave').style.display = 'block';
+                    document.getElementById('inputClave').value = '';
+                });
+            } else {
+                Swal.fire('Error', res ? res.message : 'No se pudo configurar la cuenta.', 'error');
+            }
+        });
+    },
+
     iniciarSesion: function() { 
         const c = document.getElementById('inputCedula').value; const p = document.getElementById('inputClave').value; 
         if (!p) return Swal.fire('Atención', 'Ingrese contraseña.', 'warning'); 
@@ -217,9 +280,120 @@ window.Aplicacion = {
     iniciarControlSesion: function() { if(!localStorage.getItem('sigae_usuario')) return; const resetearTiempo = () => { if(typeof Swal !== 'undefined' && Swal.isVisible() && Swal.getTitle().textContent === '¿Sigues ahí?') return; clearTimeout(this.temporizadorInactivo); clearTimeout(this.temporizadorCierre); this.temporizadorInactivo = setTimeout(() => { this.mostrarAdvertenciaSesion(); }, this.tiempoInactividad); }; window.addEventListener('mousemove', resetearTiempo); window.addEventListener('keypress', resetearTiempo); window.addEventListener('click', resetearTiempo); window.addEventListener('scroll', resetearTiempo); resetearTiempo(); },
     mostrarAdvertenciaSesion: function() { Swal.fire({ title: '¿Sigues ahí?', text: 'Cerraremos la sesión en 1 minuto por inactividad.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#0066FF', cancelButtonColor: '#FF3D00', confirmButtonText: 'Seguir activo', cancelButtonText: 'Cerrar sesión', allowOutsideClick: false, allowEscapeKey: false }).then((result) => { clearTimeout(this.temporizadorCierre); if (result.isConfirmed) { this.iniciarControlSesion(); } else { this.cerrarSesionSilenciosa(); } }); this.temporizadorCierre = setTimeout(() => { this.cerrarSesionSilenciosa(); }, this.tiempoAdvertencia); },
     cerrarSesionSilenciosa: function() { localStorage.clear(); location.reload(); },
-    dibujarMenuPrincipal: function() { const contenedorEnlaces = document.getElementById('contenedor-enlaces'); if(!contenedorEnlaces) return; let htmlMenu = `<div class="px-4 mb-3"><button onclick="Enrutador.navegar('Inicio')" id="btn-menu-Inicio" class="btn-moderno btn-primario w-100 btn-inicio-sidebar text-start" style="padding: 12px; display:flex; align-items:center;"><i class="bi bi-house-door-fill me-3 fs-5"></i> <span class="texto-menu-ocultable fw-bold">Panel Principal</span></button></div><div class="px-3"><div class="small text-muted fw-bold mb-2 px-3 texto-menu-ocultable" style="font-size:0.75rem; letter-spacing:1px;">MÓDULOS DEL SISTEMA</div>`; for (const [nombreCategoria, datosModulo] of Object.entries(this.ModulosSistema)) { const idBoton = `btn-menu-${nombreCategoria.replace(/[\s/()]/g, '-')}`; htmlMenu += `<a href="javascript:void(0)" onclick="Enrutador.navegar('${nombreCategoria}')" id="${idBoton}" class="menu-item d-flex align-items-center mb-1 rounded-3" style="padding: 12px 20px; text-decoration:none;"><i class="bi ${datosModulo.icono} me-3 fs-5" style="color: ${datosModulo.color};"></i><span class="texto-menu-ocultable">${nombreCategoria}</span></a>`; } htmlMenu += `</div>`; contenedorEnlaces.innerHTML = htmlMenu; },
+
+    dibujarMenuPrincipal: function() { 
+        const contenedorEnlaces = document.getElementById('contenedor-enlaces'); 
+        if(!contenedorEnlaces) return; 
+        
+        let htmlMenu = `<div class="px-4 mb-3"><button onclick="Enrutador.navegar('Inicio')" id="btn-menu-Inicio" class="btn-moderno btn-primario w-100 btn-inicio-sidebar text-start" style="padding: 12px; display:flex; align-items:center;"><i class="bi bi-house-door-fill me-3 fs-5"></i> <span class="texto-menu-ocultable fw-bold">Panel Principal</span></button></div><div class="px-3"><div class="small text-muted fw-bold mb-2 px-3 texto-menu-ocultable" style="font-size:0.75rem; letter-spacing:1px;">MÓDULOS DEL SISTEMA</div>`; 
+        
+        for (const [nombreCategoria, datosModulo] of Object.entries(this.ModulosSistema)) { 
+            let tieneAccesoAlMenosAUno = false;
+            for(let i=0; i < datosModulo.items.length; i++) {
+                if(this.permiso(datosModulo.items[i].vista, 'ver')) {
+                    tieneAccesoAlMenosAUno = true;
+                    break;
+                }
+            }
+
+            if (tieneAccesoAlMenosAUno) {
+                const idBoton = `btn-menu-${nombreCategoria.replace(/[\s/()]/g, '-')}`; 
+                htmlMenu += `<a href="javascript:void(0)" onclick="Enrutador.navegar('${nombreCategoria}')" id="${idBoton}" class="menu-item d-flex align-items-center mb-1 rounded-3" style="padding: 12px 20px; text-decoration:none;"><i class="bi ${datosModulo.icono} me-3 fs-5" style="color: ${datosModulo.color};"></i><span class="texto-menu-ocultable">${nombreCategoria}</span></a>`; 
+            }
+        } 
+        htmlMenu += `</div>`; 
+        contenedorEnlaces.innerHTML = htmlMenu; 
+    },
+
     marcarMenuActivo: function(nombreVista) { document.querySelectorAll('.menu-item').forEach(el => { el.classList.remove('activo'); el.style.background = 'transparent'; el.style.borderLeft = '4px solid transparent'; }); const btnInicio = document.getElementById('btn-menu-Inicio'); if (btnInicio) { btnInicio.classList.replace('btn-secundario', 'btn-primario'); } if (nombreVista === 'Inicio') return; if (btnInicio) { btnInicio.classList.replace('btn-primario', 'btn-secundario'); btnInicio.style.background = 'transparent'; btnInicio.style.color = 'var(--color-primario)'; btnInicio.style.boxShadow = 'none'; btnInicio.style.border = '2px solid var(--color-primario)'; } let categoriaPadre = nombreVista; for (const [padre, datos] of Object.entries(this.ModulosSistema)) { if (datos.items.some(i => i.vista === nombreVista)) { categoriaPadre = padre; break; } } const itemActivo = document.getElementById(`btn-menu-${categoriaPadre.replace(/[\s/()]/g, '-')}`); if (itemActivo) { itemActivo.classList.add('activo'); itemActivo.style.background = 'rgba(0, 102, 255, 0.08)'; itemActivo.style.borderLeft = '4px solid var(--color-primario)'; } },
-    generarDashboardModulo: function(nombreCategoria) { const modulo = this.ModulosSistema[nombreCategoria]; if(!modulo) return ""; let htmlTarjetas = ''; const estilos = `<style>.tarjeta-cat { background: #ffffff; border-radius: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; overflow: hidden; position: relative; display: flex; flex-direction: column; }.tarjeta-cat:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important; }.tarjeta-cat .bg-icono-gigante { position: absolute; right: -20px; bottom: -20px; font-size: 8rem; opacity: 0.03; transition: transform 0.5s ease; }.tarjeta-cat:hover .bg-icono-gigante { transform: scale(1.2) rotate(-10deg); }.tarjeta-cat .icono-cat { width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin-bottom: 1.5rem; transition: transform 0.3s ease; }.tarjeta-cat:hover .icono-cat { transform: scale(1.1); }.banner-padre { border-radius: 24px; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); } @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } } .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; } .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; } .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; } .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }</style>`; const paleta = [ { bg: 'linear-gradient(135deg, #ffffff 0%, #eff6ff 100%)', border: '#bfdbfe', text: '#0066FF' }, { bg: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)', border: '#bbf7d0', text: '#198754' }, { bg: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)', border: '#fde68a', text: '#d97706' }, { bg: 'linear-gradient(135deg, #ffffff 0%, #ecfeff 100%)', border: '#a5f3fc', text: '#0dcaf0' }, { bg: 'linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%)', border: '#ddd6fe', text: '#6d28d9' }, { bg: 'linear-gradient(135deg, #ffffff 0%, #fff1f2 100%)', border: '#fecdd3', text: '#e11d48' } ]; modulo.items.forEach((item, index) => { const tieneAcceso = this.permiso(item.vista, 'ver'); const color = paleta[index % paleta.length]; if(tieneAcceso) { htmlTarjetas += `<div class="col-12 col-md-6 col-xl-4 animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s"><div class="tarjeta-cat p-4 h-100 shadow-sm" style="background: ${color.bg}; border: 1px solid ${color.border};" onclick="Enrutador.navegar('${item.vista}')"><i class="bi ${item.icono} text-dark bg-icono-gigante"></i><div class="icono-cat shadow-sm" style="color: ${color.text}; background: white; border: 1px solid ${color.border};"><i class="bi ${item.icono}"></i></div><h4 class="fw-bold text-dark mb-2" style="position: relative; z-index: 2;">${item.vista}</h4><div class="mt-auto pt-3 d-flex align-items-center fw-bold" style="color: ${color.text}; font-size: 0.9rem; position: relative; z-index: 2;">Entrar al submódulo <i class="bi bi-arrow-right ms-2 transition-transform"></i></div></div></div>`; } else { htmlTarjetas += `<div class="col-12 col-md-6 col-xl-4 animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s"><div class="tarjeta-cat p-4 h-100 shadow-sm bg-light opacity-75" style="border: 1px solid #e2e8f0; cursor: not-allowed;" onclick="Swal.fire('Acceso Denegado', 'Su rol no tiene permisos para este submódulo.', 'error')"><i class="bi ${item.icono} text-muted bg-icono-gigante"></i><div class="icono-cat bg-secondary bg-opacity-10 text-secondary border-0"><i class="bi bi-lock-fill"></i></div><h4 class="fw-bold text-muted mb-2" style="position: relative; z-index: 2;">${item.vista}</h4><div class="mt-auto pt-3 d-flex align-items-center fw-bold text-danger" style="font-size: 0.9rem; position: relative; z-index: 2;"><i class="bi bi-shield-lock-fill me-2"></i> Acceso Restringido</div></div></div>`; } }); return `${estilos}<div class="row mb-5 animate__animated animate__fadeInDown"><div class="col-12"><div class="banner-padre p-4 p-md-5 text-white" style="background: linear-gradient(135deg, ${modulo.color} 0%, rgba(0,0,0,0.4) 150%);"><div class="burbuja-3d burbuja-1"></div><div class="burbuja-3d burbuja-2"></div><div class="burbuja-3d burbuja-3"></div><div class="row align-items-center position-relative z-1"><div class="col-md-9 text-center text-md-start mb-3 mb-md-0"><span class="badge bg-white shadow-sm mb-3 px-3 py-2 fw-bold" style="color: ${modulo.color}; letter-spacing: 1px; font-size: 0.85rem;"><i class="bi ${modulo.icono} me-1"></i> CATEGORÍA DEL SISTEMA</span><h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${nombreCategoria}</h1><p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">${modulo.desc}</p></div><div class="col-md-3 text-center text-md-end d-none d-md-block"><img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));"></div></div></div></div></div><div class="row g-4">${htmlTarjetas}</div>`; },
+    
+    generarDashboardModulo: function(nombreCategoria) { 
+        const modulo = this.ModulosSistema[nombreCategoria]; 
+        if(!modulo) return ""; 
+        let htmlTarjetas = ''; 
+        
+        const estilos = `
+        <style>
+            @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } } 
+            .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; } 
+            .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; } 
+            .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; } 
+            .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+            .banner-padre { border-radius: 24px; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+            
+            .tarjeta-modulo-nueva { background: #ffffff; border-radius: 20px; cursor: pointer; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; min-height: 190px; text-align: left; }
+            .tarjeta-modulo-nueva:hover { transform: translateY(-6px); box-shadow: 0 15px 35px rgba(0,0,0,0.08) !important; }
+            .bg-icono-gigante { position: absolute; right: -5%; bottom: -15%; font-size: 10rem; opacity: 0.05; transition: all 0.4s ease; pointer-events: none; line-height: 1; }
+            .tarjeta-modulo-nueva:hover .bg-icono-gigante { transform: scale(1.1) rotate(-5deg); opacity: 0.12; }
+            .contenido-t { padding: 1.5rem; display: flex; flex-direction: column; height: 100%; position: relative; z-index: 2; }
+            .icono-caja { width: 50px; height: 50px; border-radius: 14px; background: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: auto; }
+            .titulo-t { font-weight: 800; color: #1e293b; font-size: 1.3rem; margin-top: 2rem; margin-bottom: 0.4rem; line-height: 1.2; }
+            .link-t { font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; }
+            .link-t i { margin-left: 5px; transition: transform 0.3s; }
+            .tarjeta-modulo-nueva:hover .link-t i { transform: translateX(5px); }
+        </style>`; 
+        
+        const paleta = [ 
+            { bg: 'linear-gradient(135deg, #ffffff 0%, #eff6ff 100%)', border: '#bfdbfe', text: '#0066FF' }, 
+            { bg: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)', border: '#bbf7d0', text: '#198754' }, 
+            { bg: 'linear-gradient(135deg, #ffffff 0%, #fffbeb 100%)', border: '#fde68a', text: '#d97706' }, 
+            { bg: 'linear-gradient(135deg, #ffffff 0%, #ecfeff 100%)', border: '#a5f3fc', text: '#0dcaf0' }, 
+            { bg: 'linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%)', border: '#ddd6fe', text: '#6d28d9' }, 
+            { bg: 'linear-gradient(135deg, #ffffff 0%, #fff1f2 100%)', border: '#fecdd3', text: '#e11d48' } 
+        ]; 
+        
+        let asignados = 0;
+
+        modulo.items.forEach((item) => { 
+            const tieneAcceso = this.permiso(item.vista, 'ver'); 
+            if(tieneAcceso) { 
+                const color = paleta[asignados % paleta.length]; 
+                htmlTarjetas += `
+                <div class="col-12 col-md-6 col-xl-4 animate__animated animate__fadeInUp" style="animation-delay: ${asignados * 0.1}s">
+                    <div class="tarjeta-modulo-nueva shadow-sm" style="background: ${color.bg}; border: 2px solid ${color.border};" onclick="Enrutador.navegar('${item.vista}')">
+                        <i class="bi ${item.icono} bg-icono-gigante" style="color: ${color.text};"></i>
+                        <div class="contenido-t">
+                            <div class="icono-caja shadow-sm" style="color: ${color.text}; border: 1px solid ${color.border};">
+                                <i class="bi ${item.icono}"></i>
+                            </div>
+                            <h4 class="titulo-t">${item.vista}</h4>
+                            <span class="link-t" style="color: ${color.text};">Entrar al submódulo <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>`; 
+                asignados++;
+            } 
+        }); 
+        
+        if(asignados === 0) {
+            htmlTarjetas = `<div class="col-12 text-center py-5 mt-4"><div class="bg-light d-inline-block p-4 rounded-circle mb-3"><i class="bi bi-shield-lock-fill text-muted" style="font-size: 3rem;"></i></div><h4 class="fw-bold text-dark">Área Restringida</h4><p class="text-muted">No tiene permisos asignados para visualizar los submódulos de esta categoría.</p></div>`;
+        }
+        
+        return `${estilos}
+        <div class="row mb-5 animate__animated animate__fadeInDown">
+            <div class="col-12">
+                <div class="banner-padre p-4 p-md-5 text-white" style="background: linear-gradient(135deg, ${modulo.color} 0%, rgba(0,0,0,0.4) 150%);">
+                    <div class="burbuja-3d burbuja-1"></div>
+                    <div class="burbuja-3d burbuja-2"></div>
+                    <div class="burbuja-3d burbuja-3"></div>
+                    <div class="row align-items-center position-relative z-1">
+                        <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                            <span class="badge bg-white shadow-sm mb-3 px-3 py-2 fw-bold" style="color: ${modulo.color}; letter-spacing: 1px; font-size: 0.85rem;">
+                                <i class="bi ${modulo.icono} me-1"></i> CATEGORÍA DEL SISTEMA
+                            </span>
+                            <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${nombreCategoria}</h1>
+                            <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">${modulo.desc}</p>
+                        </div>
+                        <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                            <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4">${htmlTarjetas}</div>`; 
+    },
+    
     alternarMenu: function() { document.body.classList.toggle('menu-colapsado'); }, 
     alternarMenuMovil: function() { document.body.classList.toggle('menu-abierto'); },
     alternarClave: function(idInput) { const input = document.getElementById(idInput); const icono = input.nextElementSibling.querySelector('i'); if (input.type === 'password') { input.type = 'text'; icono.classList.replace('bi-eye', 'bi-eye-slash'); } else { input.type = 'password'; icono.classList.replace('bi-eye-slash', 'bi-eye'); } }
