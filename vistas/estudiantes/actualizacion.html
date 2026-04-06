@@ -1,0 +1,434 @@
+<style>
+    .wizard-container { position: relative; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding: 0 1rem; }
+    .wizard-line { position: absolute; top: 20px; left: 8%; right: 8%; height: 2px; background-color: #e2e8f0; z-index: 1; }
+    .wizard-step-wrapper { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 80px; }
+    .wizard-step { width: 40px; height: 40px; border-radius: 50%; background-color: white; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #94a3b8; transition: all 0.3s; margin-bottom: 8px; }
+    
+    .wizard-step-wrapper:hover .wizard-step { border-color: #8b5cf6; color: #8b5cf6; }
+    .wizard-step.activo { background-color: #8b5cf6; border-color: #8b5cf6; color: white; box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2); }
+    .wizard-step.completado { background-color: white; border-color: #8b5cf6; color: #8b5cf6; }
+    
+    .wizard-label { font-size: 0.75rem; color: #64748b; font-weight: 600; text-align: center; transition: all 0.3s; line-height: 1.1; margin-top: 4px; }
+    .wizard-step-wrapper.activo .wizard-label { color: #8b5cf6; font-weight: 700; }
+    
+    .wizard-panel { display: none; animation: fadeIn 0.4s; }
+    .wizard-panel.activo { display: block; }
+    
+    .form-label { font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 0.3rem; }
+    .form-label.label-purple { color: #8b5cf6 !important; }
+    .req { color: #e11d48; font-weight: bold; margin-left: 3px; }
+    
+    .seccion-titulo { background: #f8fafc; padding: 10px 15px; border-left: 4px solid #8b5cf6; font-weight: bold; color: #334155; margin-bottom: 15px; border-radius: 0 8px 8px 0; }
+    
+    .tarjeta-estudiante { border: 2px solid #e2e8f0; border-radius: 16px; transition: all 0.3s; cursor: pointer; background: white; overflow: hidden; }
+    .tarjeta-estudiante:hover { border-color: #8b5cf6; transform: translateY(-5px); box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15); }
+    .tarjeta-estudiante .header-tarjeta { background: #f5f3ff; padding: 15px; border-bottom: 1px solid #e2e8f0; }
+    .input-bloqueado { background-color: #f1f5f9 !important; border-color: #cbd5e1 !important; color: #64748b !important; cursor: not-allowed; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown mt-2">
+    <div class="col-12">
+        <div class="p-4 p-md-5 text-white shadow-sm d-flex align-items-center" style="background: #6d28d9; border-radius: 20px;">
+            <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center me-4 shadow-sm" style="width: 70px; height: 70px; flex-shrink: 0;">
+                <i class="bi bi-person-lines-fill fs-1"></i>
+            </div>
+            <div>
+                <h2 class="fw-bolder mb-1">Actualización de Ficha</h2>
+                <p class="mb-0 fs-6" style="color: #c4b5fd;" id="subtitulo-modulo">Seleccione a su representado para completar su expediente.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="fase-selector" class="row g-4 animate__animated animate__fadeIn">
+    <div class="col-12 text-center py-5" id="cargando-estudiantes">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+        <p class="mt-3 text-muted fw-bold fs-5">Buscando estudiantes vinculados...</p>
+    </div>
+    <div id="contenedor-tarjetas-estudiantes" class="row g-4 w-100 m-0"></div>
+</div>
+
+<div class="row animate__animated animate__fadeIn" id="fase-formulario" style="display: none;">
+    <div class="col-12 col-xl-10 mx-auto">
+        <div class="bg-white p-4 p-md-5 shadow-sm rounded-4 border-top border-5" style="border-color: #8b5cf6;">
+            
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                <h5 class="fw-bold text-dark m-0"><i class="bi bi-file-earmark-person-fill text-primary me-2"></i>Expediente: <span id="lbl-nombre-estudiante-activo" class="text-primary"></span></h5>
+                <button class="btn btn-sm btn-outline-danger rounded-pill fw-bold" onclick="window.ModActualizacion.volverAlSelector()"><i class="bi bi-x-circle me-1"></i>Cerrar Ficha</button>
+            </div>
+
+            <div class="wizard-container" id="wizard-indicadores">
+                <div class="wizard-line"></div>
+                <div class="wizard-step-wrapper activo" id="ind-wrapper-1" onclick="window.ModActualizacion.irAPaso(1)">
+                    <div class="wizard-step activo" id="ind-1">1</div><span class="wizard-label">Términos</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-2" onclick="window.ModActualizacion.irAPaso(2)">
+                    <div class="wizard-step" id="ind-2">2</div><span class="wizard-label">Identidad</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-3" onclick="window.ModActualizacion.irAPaso(3)">
+                    <div class="wizard-step" id="ind-3">3</div><span class="wizard-label">Salud y Físico</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-4" onclick="window.ModActualizacion.irAPaso(4)">
+                    <div class="wizard-step" id="ind-4">4</div><span class="wizard-label">Representante</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-5" onclick="window.ModActualizacion.irAPaso(5)">
+                    <div class="wizard-step" id="ind-5">5</div><span class="wizard-label">Padres</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-6" onclick="window.ModActualizacion.irAPaso(6)">
+                    <div class="wizard-step" id="ind-6"><i class="bi bi-check-lg fs-5"></i></div><span class="wizard-label">Encuesta Final</span>
+                </div>
+            </div>
+
+            <form id="form-actualizacion" onsubmit="event.preventDefault();">
+                
+                <div class="wizard-panel activo" id="paso-1">
+                    <h4 class="fw-bold mb-4 d-flex align-items-center text-dark">
+                        <div class="text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-size: 1.1rem; background-color: #8b5cf6;">1</div>
+                        Términos y Contrato Digital
+                    </h4>
+                    <div class="card border border-primary bg-white rounded-3 mb-4 shadow-sm text-start" style="overflow: hidden;">
+                        <div class="d-flex align-items-center justify-content-center bg-white p-3" style="border-bottom: 4px solid #0066FF;">
+                            <h3 class="fw-bolder m-0" style="color: #0088cc; font-size: 1.8rem;">Declaración Jurada</h3>
+                            <i class="bi bi-file-earmark-text ms-3" style="font-size: 2.2rem; color: #3b82f6;"></i>
+                        </div>
+                        <div class="p-4 p-md-5">
+                            <p class="text-dark mb-4" style="line-height: 1.7; text-align: justify; font-size: 0.95rem;">
+                                Declaro que la información aportada en este formulario es veraz y actualizada, comprendiendo la importancia de la misma para el control, gestión y administración (constancias, becas, otros documentos y gestiones) por parte de la U.E. Libertador Bolívar. Soy consciente además de la responsabilidad civil relacionada con la calidad de los datos que aporto.<span class="text-danger fw-bold ms-1">*</span>
+                            </p>
+                            <div class="bg-light p-3 rounded-3 border">
+                                <div class="form-check mb-3 d-flex align-items-center">
+                                    <input class="form-check-input border-secondary me-3" type="radio" name="radio-contrato" id="acepto-contrato" value="acepto" style="transform: scale(1.3); cursor: pointer;">
+                                    <label class="form-check-label text-dark mt-1 fw-bold" for="acepto-contrato" style="cursor: pointer; font-size: 0.95rem;">
+                                        Acepto los términos del Contrato Digital y deseo continuar.
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-2">
+                    <h4 class="fw-bold mb-4 d-flex align-items-center text-dark">
+                        <div class="text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-size: 1.1rem; background-color: #8b5cf6;">2</div>
+                        Datos Académicos y Personales
+                    </h4>
+                    
+                    <div class="alert bg-warning bg-opacity-10 border-warning text-dark small mb-4 rounded-3 d-flex align-items-center">
+                        <i class="bi bi-lock-fill text-warning me-3 fs-3"></i> 
+                        <span>Los datos de inscripción base no pueden ser modificados. Si existe algún error de escritura en los nombres o la cédula, diríjase a Control de Estudios.</span>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-4"><label class="form-label label-purple">Código Único</label><input type="text" class="input-moderno input-bloqueado fw-bold" id="est-codigo" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Nombres Completos</label><input type="text" class="input-moderno input-bloqueado fw-bold" id="est-nombres" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Apellidos Completos</label><input type="text" class="input-moderno input-bloqueado fw-bold" id="est-apellidos" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Cédula Escolar / Identidad</label><input type="text" class="input-moderno input-bloqueado fw-bold" id="est-cedula" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Nivel Educativo</label><input type="text" class="input-moderno input-bloqueado" id="est-nivel" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Grado / Año y Sección</label><input type="text" class="input-moderno input-bloqueado" id="est-grado-sec" readonly></div>
+                        
+                        <div class="col-12 mt-4"><div class="seccion-titulo">Complete los Siguientes Datos:</div></div>
+                        
+                        <div class="col-md-4"><label class="form-label label-purple">Género<span class="req">*</span></label><select class="input-moderno text-dark" id="est-genero"><option value="">Seleccione...</option><option>Femenino</option><option>Masculino</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Fecha de Nacimiento<span class="req">*</span></label><input type="date" class="input-moderno" id="est-nacimiento"></div>
+                        <div class="col-md-4">
+                            <label class="form-label label-purple">Nacionalidad<span class="req">*</span></label>
+                            <select class="input-moderno text-dark fw-bold shadow-sm" id="est-nacionalidad" onchange="window.ModActualizacion.cambiarNacionalidad()">
+                                <option value="">Seleccione...</option><option value="Venezolana">Venezolana</option><option value="Extranjera">Extranjera</option>
+                            </select>
+                        </div>
+                        
+                        <div id="bloque-nac-vzla" class="col-12 m-0 p-0" style="display:none;">
+                            <div class="row g-4 m-0">
+                                <div class="col-md-4"><label class="form-label label-purple">Estado (Nacimiento)<span class="req">*</span></label><select class="input-moderno text-dark" id="est-estado-nac" onchange="window.ModActualizacion.cargarMunicipiosUI('nac')"><option value="">Seleccione...</option></select></div>
+                                <div class="col-md-4"><label class="form-label label-purple">Municipio (Nacimiento)<span class="req">*</span></label><select class="input-moderno text-dark" id="est-municipio-nac" onchange="window.ModActualizacion.cargarParroquiasUI('nac')" disabled><option value="">Estado primero...</option></select></div>
+                                <div class="col-md-4"><label class="form-label label-purple">Parroquia (Nacimiento)<span class="req">*</span></label><select class="input-moderno text-dark" id="est-parroquia-nac" disabled><option value="">Municipio primero...</option></select></div>
+                                <div class="col-12"><label class="form-label label-purple">Lugar / Clínica / Hospital de Nacimiento<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="est-lugar-nac"></div>
+                            </div>
+                        </div>
+
+                        <div id="bloque-nac-ext" class="col-12 m-0 p-0 animate__animated animate__fadeIn" style="display:none;">
+                            <div class="row g-4 m-0">
+                                <div class="col-md-4"><label class="form-label label-purple">País de Origen<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="est-pais-ext" placeholder="Ej: Colombia"></div>
+                                <div class="col-md-8"><label class="form-label label-purple">Ciudad / Localidad Exacta<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="est-ciudad-ext" placeholder="Ej: Bogotá, Distrito Capital"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4"><label class="form-label label-purple">Folio (Partida Nac.)</label><input type="text" class="input-moderno txt-format" id="est-folio" placeholder="Alfanumérico (Opcional)"></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Acta (Partida Nac.)</label><input type="text" class="input-moderno txt-format" id="est-acta" placeholder="Alfanumérico (Opcional)"></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Fecha de Expedición</label><input type="date" class="input-moderno" id="est-fecha-acta"></div>
+
+                        <div class="col-12 mt-4"><div class="seccion-titulo">Dirección de Habitación y Convivencia</div></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Estado (Habitación)<span class="req">*</span></label><select class="input-moderno text-dark bg-light" id="est-estado-hab" disabled><option value="Monagas">Monagas</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Municipio (Habitación)<span class="req">*</span></label><select class="input-moderno text-dark" id="est-municipio-hab" onchange="window.ModActualizacion.cargarParroquiasUI('hab')" disabled><option value="">Estado primero...</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Parroquia (Habitación)<span class="req">*</span></label><select class="input-moderno text-dark" id="est-parroquia-hab" disabled><option value="">Municipio primero...</option></select></div>
+                        
+                        <div class="col-12 position-relative">
+                            <label class="form-label label-purple">Dirección Exacta (Sector, Calle, Casa)<span class="req">*</span></label>
+                            <textarea id="est-direccion" class="form-control input-moderno mb-1" rows="2" placeholder="Ej: Escriba su sector, avenida o calle..." oninput="window.ModActualizacion.buscarDireccionWeb(this.value, 'est-direccion', 'lista-dir-est')"></textarea>
+                            <ul id="lista-dir-est" class="list-group position-absolute w-100 shadow-lg d-none animate__animated animate__fadeInIn" style="z-index: 1000; max-height: 200px; overflow-y: auto; top: 100%;"></ul>
+                        </div>
+
+                        <div class="col-12"><label class="form-label label-purple">Vive con: (Seleccione las opciones)</label>
+                            <div class="d-flex flex-wrap gap-3 mt-2">
+                                <div class="form-check"><input class="form-check-input vive-chk border-secondary" type="checkbox" value="Padre" id="v-padre"><label class="form-check-label small" for="v-padre">Padre</label></div>
+                                <div class="form-check"><input class="form-check-input vive-chk border-secondary" type="checkbox" value="Madre" id="v-madre"><label class="form-check-label small" for="v-madre">Madre</label></div>
+                                <div class="form-check"><input class="form-check-input vive-chk border-secondary" type="checkbox" value="Abuelo(a)" id="v-abuelo"><label class="form-check-label small" for="v-abuelo">Abuelo(a)</label></div>
+                                <div class="form-check"><input class="form-check-input vive-chk border-secondary" type="checkbox" value="Hermano(a)" id="v-hermano"><label class="form-check-label small" for="v-hermano">Hermano(a)</label></div>
+                                <div class="form-check"><input class="form-check-input vive-chk border-secondary" type="checkbox" value="Tío(a)" id="v-tio"><label class="form-check-label small" for="v-tio">Tío(a)</label></div>
+                                <div class="form-check"><input class="form-check-input vive-chk border-secondary" type="checkbox" value="Primo(a)" id="v-primo"><label class="form-check-label small" for="v-primo">Primo(a)</label></div>
+                                <div class="form-check"><input class="form-check-input vive-chk border-secondary" type="checkbox" value="Otros" id="v-otros"><label class="form-check-label small" for="v-otros">Otros</label></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-3">
+                    <h4 class="fw-bold mb-4 d-flex align-items-center text-dark">
+                        <div class="text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-size: 1.1rem; background-color: #8b5cf6;">3</div>
+                        Salud, Físico y Tecnología
+                    </h4>
+                    <div class="row g-4">
+                        <div class="col-md-4"><label class="form-label label-purple">Talla Franela<span class="req">*</span></label><select class="input-moderno text-dark" id="est-talla-f"><option value="">Seleccione...</option><option>2</option><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option>14</option><option>16</option><option>S</option><option>M</option><option>L</option><option>XL</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Talla Pantalón<span class="req">*</span></label><select class="input-moderno text-dark" id="est-talla-p"><option value="">Seleccione...</option><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option>14</option><option>16</option><option>28</option><option>30</option><option>32</option><option>34</option><option>36</option></select></div>
+                        <div class="col-md-4">
+                            <label class="form-label label-purple">Talla Calzado<span class="req">*</span></label>
+                            <select class="input-moderno text-dark" id="est-talla-z">
+                                <option value="">Seleccione...</option>
+                                <option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option>
+                                <option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="39">39</option>
+                                <option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6"><label class="form-label label-purple">Estatura (Metros)<span class="req">*</span></label><input type="number" step="0.01" class="input-moderno" id="est-estatura" placeholder="Ej: 1.20"></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Peso (Kg)<span class="req">*</span></label><input type="number" step="0.1" class="input-moderno" id="est-peso" placeholder="Ej: 30.5"></div>
+                        
+                        <div class="col-md-6"><label class="form-label label-purple">¿Padece Alergias?</label><input type="text" class="input-moderno txt-format" id="est-alergias" placeholder="Ninguna u Otros (Especifique)"></div>
+                        <div class="col-md-6"><label class="form-label label-purple">¿Condición Médica?</label><input type="text" class="input-moderno txt-format" id="est-medico" placeholder="Ninguna u Otros (Especifique)"></div>
+                        
+                        <div class="col-12 mt-4"><div class="seccion-titulo">Acceso Tecnológico</div></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Posee Computadora<span class="req">*</span></label><select class="input-moderno text-dark" id="est-pc"><option value="">Seleccione...</option><option>Canaima</option><option>PC de Escritorio</option><option>Laptop</option><option>Ninguna</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Posee Internet<span class="req">*</span></label><select class="input-moderno text-dark" id="est-internet"><option value="">Seleccione...</option><option>Si</option><option>No</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Posee Celular<span class="req">*</span></label><select class="input-moderno text-dark" id="est-celular"><option value="">Seleccione...</option><option>Primera y Segunda Generación</option><option>Tercera Generación (Inteligente)</option><option>No tengo teléfono celular</option></select></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-4">
+                    <h4 class="fw-bold mb-4 d-flex align-items-center text-dark">
+                        <div class="text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-size: 1.1rem; background-color: #8b5cf6;">4</div>
+                        Datos del Representante Legal
+                    </h4>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label label-purple">Parentesco con el Estudiante<span class="req">*</span></label>
+                            <select class="input-moderno text-dark" id="rep-parentesco"><option value="">Cargando...</option></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label label-purple">Relación Laboral (PDVSA)<span class="req">*</span></label>
+                            <select class="input-moderno fw-bold text-dark border-primary bg-light" id="rep-relacion" onchange="window.ModActualizacion.cambiarRelacionLaboral()">
+                                <option value="">Seleccione vinculación...</option>
+                                <option value="Activo">Trabajador Activo PDVSA/Filiales</option>
+                                <option value="Jubilado">Jubilado PDVSA</option>
+                                <option value="Comunidad">Comunidad (Sin vínculo PDVSA)</option>
+                                <option value="Fallecido">Fallecido (Con vínculo PDVSA)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-8"><label class="form-label label-purple">Nombres y Apellidos</label><input type="text" class="input-moderno input-bloqueado txt-format" id="rep-nombres" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Cédula</label><input type="text" class="input-moderno input-bloqueado" id="rep-cedula" readonly></div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label label-purple">Teléfono de Contacto<span class="req">*</span></label>
+                            <div class="input-group">
+                                <select id="rep-cod-tel" class="form-select input-moderno bg-light" style="max-width: 100px; font-weight: bold;">
+                                    <option value="+58">🇻🇪 +58</option><option value="+57">🇨🇴 +57</option><option value="+56">🇨🇱 +56</option>
+                                    <option value="+55">🇧🇷 +55</option><option value="+54">🇦🇷 +54</option><option value="+52">🇲🇽 +52</option>
+                                    <option value="+51">🇵🇪 +51</option><option value="+1">🇺🇸 +1</option><option value="+34">🇪🇸 +34</option>
+                                </select>
+                                <input type="text" class="form-control input-moderno" id="rep-telefono" placeholder="4141234567" oninput="this.value = this.value.replace(/\\D/g, '')">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6"><label class="form-label label-purple">Correo Personal<span class="req">*</span></label><input type="email" class="input-moderno" id="rep-correo"></div>
+                        
+                        <div class="col-12 position-relative">
+                            <div class="d-flex flex-wrap justify-content-between align-items-end mb-1">
+                                <label class="form-label label-purple mb-0">Dirección de Habitación Exacta<span class="req">*</span></label>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input border-secondary" type="checkbox" id="chk-dir-rep" onchange="window.ModActualizacion.copiarDireccionEstudiante('chk-dir-rep', 'rep-direccion')">
+                                    <label class="form-check-label small fw-bold text-muted" for="chk-dir-rep">Usar misma dirección del estudiante</label>
+                                </div>
+                            </div>
+                            <input type="text" class="input-moderno" id="rep-direccion" placeholder="Ej: Urbanización, Calle, Sector..." oninput="window.ModActualizacion.buscarDireccionWeb(this.value, 'rep-direccion', 'lista-dir-rep')">
+                            <ul id="lista-dir-rep" class="list-group position-absolute w-100 shadow-lg d-none animate__animated animate__fadeInIn" style="z-index: 1000; max-height: 200px; overflow-y: auto; top: 100%;"></ul>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mt-2 animate__animated animate__fadeIn" id="bloque-pdvsa" style="display: none;">
+                        <div class="col-12"><div class="seccion-titulo bg-primary bg-opacity-10 border-primary text-primary"><i class="bi bi-buildings-fill me-2"></i>Perfil Corporativo PDVSA</div></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Correo PDVSA</label><input type="email" class="input-moderno" id="rep-correo-pdvsa"></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Tipo de Nómina<span class="req">*</span></label><select class="input-moderno text-dark" id="corp-nomina"><option value="">Cargando...</option></select></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Negocio / Filial<span class="req">*</span></label><select class="input-moderno text-dark" id="corp-filial"><option value="">Cargando...</option></select></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Organización / Gerencia<span class="req">*</span></label><select class="input-moderno text-dark" id="corp-gerencia"><option value="">Cargando...</option></select></div>
+                        <div class="col-12"><label class="form-label label-purple">Localidad de Trabajo (Opcional)</label><input type="text" class="input-moderno txt-format" id="rep-localidad" placeholder="Ej: Clínica Bajo Guarapiche, ESEM..."></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-5">
+                    <h4 class="fw-bold mb-4 d-flex align-items-center text-dark">
+                        <div class="text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-size: 1.1rem; background-color: #8b5cf6;">5</div>
+                        Datos de la Madre y Padre
+                    </h4>
+                    
+                    <div class="col-12 mb-4 p-3 bg-light rounded-4 border">
+                        <label class="form-label label-purple fw-bold mb-2">El estudiante está reconocido legalmente por (En Partida Nac.):<span class="req">*</span></label>
+                        <select class="form-select input-moderno fw-bold text-primary border-primary" id="padre-reconoce" onchange="window.ModActualizacion.cambiarReconocido()">
+                            <option value="">Seleccione opción...</option>
+                            <option value="Ambos Padres">Ambos Padres</option>
+                            <option value="Solo la Madre">Solo la Madre</option>
+                            <option value="Solo el Padre">Solo el Padre</option>
+                        </select>
+                    </div>
+                    
+                    <div id="bloque-madre" style="display: none;" class="mb-4 animate__animated animate__fadeIn">
+                        <div class="seccion-titulo d-flex flex-wrap justify-content-between align-items-center mb-4">
+                            <span><i class="bi bi-person-standing-dress me-2"></i>Datos de la Madre</span>
+                            <div class="form-check form-switch m-0 fs-6">
+                                <input class="form-check-input border-secondary" type="checkbox" id="chk-rep-es-madre" onchange="window.ModActualizacion.copiarDatosRepresentante('madre')">
+                                <label class="form-check-label small fw-bold text-primary" for="chk-rep-es-madre">Es la Representante Legal</label>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-8"><label class="form-label label-purple">Nombres y Apellidos<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="madre-nombres"></div>
+                            <div class="col-md-4"><label class="form-label label-purple">Cédula<span class="req">*</span></label><input type="text" class="input-moderno" id="madre-cedula" oninput="window.ModActualizacion.formatearCedula(this)"></div>
+                            <div class="col-md-4"><label class="form-label label-purple">Nacionalidad<span class="req">*</span></label><select class="input-moderno" id="madre-nacionalidad"><option value="">Seleccione...</option><option value="Venezolana">Venezolana</option><option value="Extranjera">Extranjera</option></select></div>
+                            <div class="col-md-4"><label class="form-label label-purple">Fecha de Nacimiento<span class="req">*</span></label><input type="date" class="input-moderno" id="madre-fecha"></div>
+                            <div class="col-md-4"><label class="form-label label-purple">Lugar de Nacimiento</label><input type="text" class="input-moderno txt-format" id="madre-lugar"></div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label label-purple">Teléfono Celular<span class="req">*</span></label>
+                                <div class="input-group">
+                                    <select id="madre-cod-tel" class="form-select input-moderno bg-light" style="max-width: 100px; font-weight: bold;"><option value="+58">🇻🇪 +58</option><option value="+57">🇨🇴 +57</option><option value="+56">🇨🇱 +56</option><option value="+55">🇧🇷 +55</option><option value="+54">🇦🇷 +54</option><option value="+52">🇲🇽 +52</option><option value="+51">🇵🇪 +51</option><option value="+1">🇺🇸 +1</option><option value="+34">🇪🇸 +34</option></select>
+                                    <input type="text" class="form-control input-moderno" id="madre-tel" placeholder="4141234567" oninput="this.value = this.value.replace(/\\D/g, '')">
+                                </div>
+                            </div>
+                            <div class="col-md-6"><label class="form-label label-purple">Correo Personal<span class="req">*</span></label><input type="email" class="input-moderno" id="madre-correo"></div>
+                            
+                            <div class="col-12 position-relative">
+                                <div class="d-flex flex-wrap justify-content-between align-items-end mb-1">
+                                    <label class="form-label label-purple mb-0">Dirección de Habitación<span class="req">*</span></label>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input border-secondary" type="checkbox" id="chk-dir-madre" onchange="window.ModActualizacion.copiarDireccionEstudiante('chk-dir-madre', 'madre-dir')">
+                                        <label class="form-check-label small fw-bold text-muted" for="chk-dir-madre">Usar misma dirección del estudiante</label>
+                                    </div>
+                                </div>
+                                <input type="text" class="input-moderno" id="madre-dir" placeholder="Escriba la dirección exacta..." oninput="window.ModActualizacion.buscarDireccionWeb(this.value, 'madre-dir', 'lista-dir-madre')">
+                                <ul id="lista-dir-madre" class="list-group position-absolute w-100 shadow-lg d-none animate__animated animate__fadeInIn" style="z-index: 1000; max-height: 200px; overflow-y: auto; top: 100%;"></ul>
+                            </div>
+                            
+                            <div class="col-md-6"><label class="form-label label-purple">Nivel Académico<span class="req">*</span></label><select class="input-moderno" id="madre-nivel-acad"><option value="">Seleccione...</option><option value="Bachiller">Bachiller</option><option value="T.S.U">Técnico Superior Universitario</option><option value="Profesional">Profesional / Licenciado</option><option value="Postgrado">Postgrado / Maestría / Doctorado</option><option value="Básica">Educación Básica</option><option value="Ninguno">Ninguno</option></select></div>
+                            <div class="col-md-6"><label class="form-label label-purple">Profesión u Oficio<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="madre-profesion" placeholder="Ej: Ingeniera, Contadora, Ama de casa..."></div>
+
+                            <div class="col-md-4"><label class="form-label label-purple">¿Trabajadora PDVSA?<span class="req">*</span></label><select class="input-moderno text-dark" id="madre-pdvsa"><option value="">Sel...</option><option>Si</option><option>No</option></select></div>
+                            <div class="col-md-4"><label class="form-label label-purple">¿Formación Hidrocarburos?<span class="req">*</span></label><select class="input-moderno text-dark" id="madre-hidro"><option value="">Sel...</option><option>Si</option><option>No</option></select></div>
+                            <div class="col-md-4"><label class="form-label label-purple">¿Componente Docente?<span class="req">*</span></label><select class="input-moderno text-dark" id="madre-docente"><option value="">Sel...</option><option>Si</option><option>No</option></select></div>
+                        </div>
+                    </div>
+
+                    <div id="bloque-padre" style="display: none;" class="mb-4 mt-3 animate__animated animate__fadeIn">
+                        <div class="seccion-titulo d-flex flex-wrap justify-content-between align-items-center mb-4">
+                            <span><i class="bi bi-person-standing me-2"></i>Datos del Padre</span>
+                            <div class="form-check form-switch m-0 fs-6">
+                                <input class="form-check-input border-secondary" type="checkbox" id="chk-rep-es-padre" onchange="window.ModActualizacion.copiarDatosRepresentante('padre')">
+                                <label class="form-check-label small fw-bold text-primary" for="chk-rep-es-padre">Es el Representante Legal</label>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-8"><label class="form-label label-purple">Nombres y Apellidos<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="padre-nombres"></div>
+                            <div class="col-md-4"><label class="form-label label-purple">Cédula<span class="req">*</span></label><input type="text" class="input-moderno" id="padre-cedula" oninput="window.ModActualizacion.formatearCedula(this)"></div>
+                            <div class="col-md-4"><label class="form-label label-purple">Nacionalidad<span class="req">*</span></label><select class="input-moderno" id="padre-nacionalidad"><option value="">Seleccione...</option><option value="Venezolana">Venezolana</option><option value="Extranjera">Extranjera</option></select></div>
+                            <div class="col-md-4"><label class="form-label label-purple">Fecha de Nacimiento<span class="req">*</span></label><input type="date" class="input-moderno" id="padre-fecha"></div>
+                            <div class="col-md-4"><label class="form-label label-purple">Lugar de Nacimiento</label><input type="text" class="input-moderno txt-format" id="padre-lugar"></div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label label-purple">Teléfono Celular<span class="req">*</span></label>
+                                <div class="input-group">
+                                    <select id="padre-cod-tel" class="form-select input-moderno bg-light" style="max-width: 100px; font-weight: bold;"><option value="+58">🇻🇪 +58</option><option value="+57">🇨🇴 +57</option><option value="+56">🇨🇱 +56</option><option value="+55">🇧🇷 +55</option><option value="+54">🇦🇷 +54</option><option value="+52">🇲🇽 +52</option><option value="+51">🇵🇪 +51</option><option value="+1">🇺🇸 +1</option><option value="+34">🇪🇸 +34</option></select>
+                                    <input type="text" class="form-control input-moderno" id="padre-tel" placeholder="4141234567" oninput="this.value = this.value.replace(/\\D/g, '')">
+                                </div>
+                            </div>
+                            <div class="col-md-6"><label class="form-label label-purple">Correo Personal<span class="req">*</span></label><input type="email" class="input-moderno" id="padre-correo"></div>
+                            
+                            <div class="col-12 position-relative">
+                                <div class="d-flex flex-wrap justify-content-between align-items-end mb-1">
+                                    <label class="form-label label-purple mb-0">Dirección de Habitación<span class="req">*</span></label>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input border-secondary" type="checkbox" id="chk-dir-padre" onchange="window.ModActualizacion.copiarDireccionEstudiante('chk-dir-padre', 'padre-dir')">
+                                        <label class="form-check-label small fw-bold text-muted" for="chk-dir-padre">Usar misma dirección del estudiante</label>
+                                    </div>
+                                </div>
+                                <input type="text" class="input-moderno" id="padre-dir" placeholder="Escriba la dirección exacta..." oninput="window.ModActualizacion.buscarDireccionWeb(this.value, 'padre-dir', 'lista-dir-padre')">
+                                <ul id="lista-dir-padre" class="list-group position-absolute w-100 shadow-lg d-none animate__animated animate__fadeInIn" style="z-index: 1000; max-height: 200px; overflow-y: auto; top: 100%;"></ul>
+                            </div>
+                            
+                            <div class="col-md-6"><label class="form-label label-purple">Nivel Académico<span class="req">*</span></label><select class="input-moderno" id="padre-nivel-acad"><option value="">Seleccione...</option><option value="Bachiller">Bachiller</option><option value="T.S.U">Técnico Superior Universitario</option><option value="Profesional">Profesional / Licenciado</option><option value="Postgrado">Postgrado / Maestría / Doctorado</option><option value="Básica">Educación Básica</option><option value="Ninguno">Ninguno</option></select></div>
+                            <div class="col-md-6"><label class="form-label label-purple">Profesión u Oficio<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="padre-profesion" placeholder="Ej: Ingeniero, Abogado, Chofer..."></div>
+
+                            <div class="col-md-4"><label class="form-label label-purple">¿Trabajador PDVSA?<span class="req">*</span></label><select class="input-moderno text-dark" id="padre-pdvsa"><option value="">Sel...</option><option>Si</option><option>No</option></select></div>
+                            <div class="col-md-4"><label class="form-label label-purple">¿Formación Hidrocarburos?<span class="req">*</span></label><select class="input-moderno text-dark" id="padre-hidro"><option value="">Sel...</option><option>Si</option><option>No</option></select></div>
+                            <div class="col-md-4"><label class="form-label label-purple">¿Componente Docente?<span class="req">*</span></label><select class="input-moderno text-dark" id="padre-docente"><option value="">Sel...</option><option>Si</option><option>No</option></select></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-6">
+                    <h4 class="fw-bold mb-4 d-flex align-items-center text-dark">
+                        <div class="text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-size: 1.1rem; background-color: #8b5cf6;">6</div>
+                        Logística y Encuesta Final
+                    </h4>
+                    
+                    <div class="seccion-titulo bg-warning bg-opacity-10 border-warning text-dark"><i class="bi bi-bus-front-fill text-warning me-2"></i>Ruta de Transporte Escolar</div>
+                    <div class="row g-4 mb-5">
+                        <div class="col-12"><label class="form-label label-purple">Ruta Asignada<span class="req">*</span></label><select class="input-moderno text-dark" id="est-ruta" onchange="window.ModActualizacion.filtrarParadas()"><option value="">Seleccione...</option></select></div>
+                        <div class="col-12"><label class="form-label label-purple">Parada Específica<span class="req">*</span></label><select class="input-moderno text-dark" id="est-parada" disabled><option value="">Seleccione primero la ruta...</option></select></div>
+                    </div>
+
+                    <div class="seccion-titulo bg-info bg-opacity-10 border-info text-dark"><i class="bi bi-ui-checks-grid text-info me-2"></i>Encuesta Integral Escolar</div>
+                    <div class="row g-4">
+                        <div class="col-12"><label class="form-label label-purple">¿Cómo evalúa la metodología implementada por la U.E.?</label><select class="input-moderno text-dark" id="enc-metodologia"><option value="">Seleccione...</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>
+                        <div class="col-12"><label class="form-label label-purple">¿Qué recursos considera factibles para apoyo escolar?</label>
+                            <div class="d-flex flex-wrap gap-3 mt-2">
+                                <div class="form-check"><input class="form-check-input enc-rec border-secondary" type="checkbox" value="Guías Pedagógicas" id="r-guias"><label class="form-check-label small" for="r-guias">Guías</label></div>
+                                <div class="form-check"><input class="form-check-input enc-rec border-secondary" type="checkbox" value="Programas TV" id="r-tv"><label class="form-check-label small" for="r-tv">TV</label></div>
+                                <div class="form-check"><input class="form-check-input enc-rec border-secondary" type="checkbox" value="Programas de Radio" id="r-radio"><label class="form-check-label small" for="r-radio">Radio</label></div>
+                                <div class="form-check"><input class="form-check-input enc-rec border-secondary" type="checkbox" value="Paquetes Interactivos" id="r-paq"><label class="form-check-label small" for="r-paq">Interactivos</label></div>
+                                <div class="form-check"><input class="form-check-input enc-rec border-secondary" type="checkbox" value="AulaChat" id="r-aula"><label class="form-check-label small" for="r-aula">AulaChat</label></div>
+                                <div class="form-check"><input class="form-check-input enc-rec border-secondary" type="checkbox" value="Otros" id="r-otros"><label class="form-check-label small" for="r-otros">Otros</label></div>
+                            </div>
+                        </div>
+                        <div class="col-12"><label class="form-label label-purple">Medios de comunicación factibles:</label>
+                            <div class="d-flex flex-wrap gap-3 mt-2">
+                                <div class="form-check"><input class="form-check-input enc-med border-secondary" type="checkbox" value="Telegram" id="m-tel"><label class="form-check-label small" for="m-tel">Telegram</label></div>
+                                <div class="form-check"><input class="form-check-input enc-med border-secondary" type="checkbox" value="Correo Electrónico" id="m-mail"><label class="form-check-label small" for="m-mail">Correo</label></div>
+                                <div class="form-check"><input class="form-check-input enc-med border-secondary" type="checkbox" value="Página Web" id="m-web"><label class="form-check-label small" for="m-web">Web</label></div>
+                                <div class="form-check"><input class="form-check-input enc-med border-secondary" type="checkbox" value="Otros" id="m-otros"><label class="form-check-label small" for="m-otros">Otros</label></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4"><label class="form-label label-purple">Evaluación del Portal Web</label><select class="input-moderno text-dark" id="enc-portal"><option value="">Seleccione...</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Evaluación de Boletines</label><select class="input-moderno text-dark" id="enc-boletines"><option value="">Seleccione...</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Eval. Módulo Actualización</label><select class="input-moderno text-dark" id="enc-actualizacion"><option value="">Seleccione...</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>
+                        <div class="col-12"><label class="form-label label-purple">Aportes y Sugerencias</label><textarea id="enc-aportes" class="input-moderno" rows="2"></textarea></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-5 pt-4 border-top">
+                    <button type="button" class="btn btn-light border fw-bold text-muted px-4 shadow-sm hover-efecto" id="btn-prev" onclick="window.ModActualizacion.cambiarPaso(-1)" style="display: none;"><i class="bi bi-arrow-left me-2"></i> Atrás</button>
+                    <button type="button" class="btn fw-bold px-5 shadow-sm hover-efecto ms-auto text-white" style="background: #8B5CF6; border-color: #8B5CF6;" id="btn-next" onclick="window.ModActualizacion.cambiarPaso(1)">Siguiente <i class="bi bi-arrow-right ms-2"></i></button>
+                    <button type="button" class="btn btn-success fw-bold px-5 shadow-sm hover-efecto ms-auto" id="btn-save" onclick="window.ModActualizacion.guardarActualizacion()" style="display: none;"><i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar Expediente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
