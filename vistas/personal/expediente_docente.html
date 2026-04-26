@@ -213,26 +213,29 @@
 
                 <div class="wizard-panel" id="paso-4">
                     <h4 class="fw-bold mb-4 text-dark">IV. Perfil Corporativo</h4>
+                    
+                    <div class="alert alert-warning small fw-bold mb-4 shadow-sm border-warning">
+                        <i class="bi bi-lock-fill me-2 fs-5"></i> El Historial Interno y el Desarrollo de Carrera son de uso y modificación exclusiva del departamento de RRHH.
+                    </div>
+
                     <div class="row g-4 mb-4">
-                        <div class="col-md-4"><label class="form-label label-blue">Fecha de Ingreso</label><input type="date" class="input-moderno" id="doc-fecha-ingreso"></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Fecha de Ingreso</label><input type="date" class="input-moderno bg-light text-muted" id="doc-fecha-ingreso" readonly></div>
                         <div class="col-md-4"><label class="form-label label-blue">Años de Servicio</label><input type="text" class="input-moderno bg-light fw-bold text-primary" id="doc-anios-servicio" readonly></div>
-                        <div class="col-md-4"><label class="form-label label-blue">Grupo Salarial</label><input type="text" class="input-moderno" id="doc-grupo-salarial"></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Grupo Salarial</label><input type="text" class="input-moderno bg-light text-muted" id="doc-grupo-salarial" readonly></div>
                         
-                        <div class="col-md-4"><label class="form-label label-blue">Posición Actual (Cargo)</label><input type="text" class="input-moderno txt-format" id="doc-posicion-actual"></div>
-                        <div class="col-md-4"><label class="form-label label-blue">Gerencia / Departamento</label><input type="text" class="input-moderno txt-format" id="doc-gerencia"></div>
-                        <div class="col-md-4"><label class="form-label label-blue">Organización / Proceso</label><input type="text" class="input-moderno txt-format" id="doc-organizacion"></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Posición Actual (Cargo)</label><input type="text" class="input-moderno txt-format bg-light text-muted" id="doc-posicion-actual" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Gerencia / Departamento</label><input type="text" class="input-moderno txt-format bg-light text-muted" id="doc-gerencia" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Organización / Proceso</label><input type="text" class="input-moderno txt-format bg-light text-muted" id="doc-organizacion" readonly></div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-3 mt-4 border-top pt-4">
-                        <div class="seccion-titulo bg-warning bg-opacity-10 border-warning text-dark mb-0 flex-grow-1 me-3"><i class="bi bi-clock-history me-2 text-warning"></i>Histórico de Posiciones Internas (Máx. 10)</div>
-                        <button type="button" class="btn btn-sm btn-outline-warning fw-bold rounded-pill text-dark shadow-sm" onclick="window.ModExpedienteDocente.agregarPosicion()"><i class="bi bi-plus-lg me-1"></i> Añadir Posición</button>
+                        <div class="seccion-titulo bg-warning bg-opacity-10 border-warning text-dark mb-0 flex-grow-1"><i class="bi bi-clock-history me-2 text-warning"></i>Histórico de Posiciones Internas (Solo Lectura)</div>
                     </div>
                     <div id="contenedor-posiciones-dinamicos"></div>
                     <p id="msg-sin-posiciones" class="text-center text-muted small mt-3 fw-bold">No hay histórico de posiciones registrado.</p>
 
                     <div class="d-flex justify-content-between align-items-center mb-3 mt-4 border-top pt-4">
-                        <div class="seccion-titulo bg-success bg-opacity-10 border-success text-dark mb-0 flex-grow-1 me-3"><i class="bi bi-briefcase me-2 text-success"></i>Experiencia Laboral Externa (Máx. 5)</div>
-                        <button type="button" class="btn btn-sm btn-outline-success fw-bold rounded-pill text-dark shadow-sm" onclick="window.ModExpedienteDocente.agregarExperiencia()"><i class="bi bi-plus-lg me-1"></i> Añadir Experiencia</button>
+                        <div class="seccion-titulo bg-success bg-opacity-10 border-success text-dark mb-0 flex-grow-1"><i class="bi bi-briefcase me-2 text-success"></i>Experiencia Laboral Externa (Solo Lectura)</div>
                     </div>
                     <div id="contenedor-experiencias-dinamicos"></div>
                     <p id="msg-sin-experiencias" class="text-center text-muted small mt-3 fw-bold">No hay experiencia laboral externa registrada.</p>
@@ -240,11 +243,11 @@
                     <div class="row g-4 mt-2">
                         <div class="col-md-6 pt-3 border-top">
                             <label class="form-label label-blue"><i class="bi bi-graph-up-arrow me-2"></i>V. Desarrollo de Carrera</label>
-                            <textarea class="input-moderno txt-format" id="doc-desarrollo" rows="3" placeholder="Información cualitativa sobre su desarrollo..."></textarea>
+                            <textarea class="input-moderno txt-format bg-light text-muted" id="doc-desarrollo" rows="3" placeholder="Información administrada por RRHH..." readonly></textarea>
                         </div>
                         <div class="col-md-6 pt-3 border-top">
                             <label class="form-label label-blue"><i class="bi bi-card-text me-2"></i>VI. Observaciones</label>
-                            <textarea class="input-moderno txt-format" id="doc-observaciones" rows="3" placeholder="Observaciones generales de su perfil..."></textarea>
+                            <textarea class="input-moderno txt-format bg-light text-muted" id="doc-observaciones" rows="3" placeholder="Observaciones exclusivas de RRHH..." readonly></textarea>
                         </div>
                     </div>
                 </div>
